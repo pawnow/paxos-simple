@@ -1,10 +1,13 @@
 package pl.edu.agh.iosr.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.agh.iosr.cdm.Proposal;
+import pl.edu.agh.iosr.cdm.ProposalRepository;
 
 import java.util.Optional;
 
@@ -12,10 +15,16 @@ import java.util.Optional;
 @RestController
 public class AcceptorController {
 
+    @Autowired
+    private ProposalRepository proposalRepository;
+
     private Optional<Proposal> acceptedProposal = Optional.empty();
 
+    @Transactional
     @RequestMapping(method = RequestMethod.GET, value = "/accept")
     public Proposal getAcceptedProposal() {
+        proposalRepository.save(new Proposal(22l, 33));
+        proposalRepository.findAll();
         return acceptedProposal.orElseGet(() -> null);
     }
 
