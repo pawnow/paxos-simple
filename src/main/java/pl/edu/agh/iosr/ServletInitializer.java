@@ -1,4 +1,4 @@
-package hello;
+package pl.edu.agh.iosr;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
