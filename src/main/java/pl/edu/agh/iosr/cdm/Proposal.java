@@ -16,7 +16,6 @@ import javax.persistence.Id;
 public class Proposal {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
     private Integer value;
 
