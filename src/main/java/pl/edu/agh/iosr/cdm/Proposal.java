@@ -13,7 +13,6 @@ import javax.persistence.Id;
 @Data
 @Builder
 @Entity
-
 public class Proposal {
 
     @Id

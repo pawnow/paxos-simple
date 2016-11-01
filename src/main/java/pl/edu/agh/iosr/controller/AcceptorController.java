@@ -23,8 +23,6 @@ public class AcceptorController {
     @Transactional
     @RequestMapping(method = RequestMethod.GET, value = "/accept")
     public Proposal getAcceptedProposal() {
-        proposalRepository.save(new Proposal(22l, 33));
-        proposalRepository.findAll();
         return acceptedProposal.orElseGet(() -> null);
     }
 
