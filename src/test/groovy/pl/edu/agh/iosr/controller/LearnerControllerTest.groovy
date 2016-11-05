@@ -27,7 +27,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return empty proposal'
         response.status == OK.value()
-        response.contentAsString == '{"id":0,"value":0}'
+        response.contentAsString == '{"id":null,"value":null}'
     }
 
     def testShouldLearnNewProposal() {
@@ -62,7 +62,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return empty proposal'
         response.status == OK.value()
-        response.contentAsString == '{"id":0,"value":0}'
+        response.contentAsString == '{"id":null,"value":null}'
     }
 
 }
