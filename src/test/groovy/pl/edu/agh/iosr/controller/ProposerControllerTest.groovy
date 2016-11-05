@@ -21,7 +21,7 @@ public class ProposerControllerTest extends Specification {
 
         then: 'proposer controller should return empty proposal'
         response.status == OK.value()
-        response.contentAsString == '{"id":0,"value":0}'
+        response.contentAsString == '{"id":0,"value":null}'
     }
 
 }
