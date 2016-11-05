@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.agh.iosr.cdm.Proposal;
 import pl.edu.agh.iosr.cdm.ProposalRepository;
+import pl.edu.agh.iosr.service.AcceptorService;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,9 @@ public class AcceptorController {
 
     @Autowired
     private ProposalRepository proposalRepository;
+
+    @Autowired
+    private AcceptorService acceptorService;
 
 
     @Transactional
@@ -34,9 +38,15 @@ public class AcceptorController {
 
         if (shouldAccept(newProposal, previouslyAcceptedProposal)) {
             acceptNewProposal(newProposal);
+            informLearnersAndProposers(newProposal);
             return previouslyAcceptedProposal.orElseGet(() -> null);
         }
         return null;
+    }
+
+    private void informLearnersAndProposers(Proposal newProposal) {
+
+        acceptorService.informLearnersAndProposers(newProposal);
     }
 
     private boolean shouldAccept(Proposal newProposal, Optional<Proposal> previouslyAcceptedProposal) {

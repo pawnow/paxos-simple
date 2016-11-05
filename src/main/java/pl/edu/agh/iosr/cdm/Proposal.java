@@ -2,6 +2,7 @@ package pl.edu.agh.iosr.cdm;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -9,6 +10,7 @@ import javax.persistence.Id;
 @Data
 @Builder
 @Entity
+@ToString
 public class Proposal {
 
     @Id
