@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import pl.edu.agh.iosr.cdm.Proposal
+import pl.edu.agh.iosr.utils.ApplicationEndpoints
 import spock.lang.Specification
 
 import static org.springframework.http.HttpStatus.OK
@@ -13,7 +14,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 public class LearnerControllerTest extends Specification {
 
-    public static final String LEARNED_URL = '/learner/learn'
+    public static final String LEARNED_URL = ApplicationEndpoints.LERNER_URL.getEndpoint()
     def Gson gson = new Gson()
     MockMvc mockMvc;
 

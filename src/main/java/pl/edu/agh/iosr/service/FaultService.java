@@ -11,7 +11,7 @@ public class FaultService {
 
     private static Boolean isDown = false;
 
-    public static Boolean isDown() {
+    public Boolean isDown() {
         //pytanie: synchronized konieczne??
         synchronized (isDown){
             return isDown;
@@ -19,14 +19,12 @@ public class FaultService {
     }
 
     public void destroyNode(){
-
         synchronized (isDown){
             isDown = true;
         }
     }
 
     public void repareNode(){
-
         synchronized (isDown){
             isDown = false;
 

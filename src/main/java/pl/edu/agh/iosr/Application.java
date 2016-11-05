@@ -28,9 +28,10 @@ public class Application {
 
         return (args) ->{
             nodesRegistryRepository.deleteAll();
-            nodesRegistryRepository.save(new Node(1l, "localhost:8081"));
+            nodesRegistryRepository.save(new Node(4l, "paxos1.qwxpdbpqdg.eu-west-1.elasticbeanstalk.com:80"));
+            nodesRegistryRepository.save(new Node(3l, "localhost:8081"));
             nodesRegistryRepository.save(new Node(2l, "localhost:8082"));
-            nodesRegistryRepository.save(new Node(3l, "localhost:8083"));
+            nodesRegistryRepository.save(new Node(1l, "localhost:8083"));
 
         };
     }

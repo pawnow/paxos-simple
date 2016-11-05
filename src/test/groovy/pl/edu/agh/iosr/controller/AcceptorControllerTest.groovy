@@ -8,6 +8,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import pl.edu.agh.iosr.cdm.Proposal
 import pl.edu.agh.iosr.cdm.ProposalRepository
+import pl.edu.agh.iosr.utils.ApplicationEndpoints
 import spock.lang.Specification
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,7 +21,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 public class AcceptorControllerTest extends Specification {
 
-    public static final String ACCEPTOR_URL = '/acceptor/accept'
+    public static final String ACCEPTOR_URL = ApplicationEndpoints.ACCEPTOR_URL.getEndpoint()
     def Gson gson = new Gson()
 
     @Mock
