@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.filter.DelegatingFilterProxy;
 import pl.edu.agh.iosr.cdm.Node;
 import pl.edu.agh.iosr.cdm.NodesRegistryRepository;
 
@@ -15,6 +16,12 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
+
+    @Bean
+    public DelegatingFilterProxy configure(){
+        return new ServerFaultFilter();
+
+    }
     @Bean
     @Transactional
     public CommandLineRunner prepareRegistry(NodesRegistryRepository nodesRegistryRepository){
