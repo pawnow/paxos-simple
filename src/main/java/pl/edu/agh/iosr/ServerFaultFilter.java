@@ -19,7 +19,7 @@ public class ServerFaultFilter extends DelegatingFilterProxy {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
         if(faultService.isDown()){
-            //// TODO: 05.11.16 return 404 albo coś w ten deseń
+            throw new RuntimeException("Node is down");
         } else {
             filterChain.doFilter(servletRequest, servletResponse);
         }
