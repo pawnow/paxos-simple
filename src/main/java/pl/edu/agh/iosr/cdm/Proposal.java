@@ -19,8 +19,9 @@ public class Proposal {
     public Proposal() {
     }
 
-    public Proposal(Long id, Integer value) {
+    public Proposal(Long id, Integer value, String server) {
         this.id = id;
         this.value = value;
+        this.server = server;
     }
 }
