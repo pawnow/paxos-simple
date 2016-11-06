@@ -1,5 +1,6 @@
 package pl.edu.agh.iosr.controller
 
+import com.google.gson.Gson
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
@@ -37,6 +38,8 @@ public class ProposerControllerTest extends Specification {
     @InjectMocks
     ProposerController controllerUnderTest
 
+    def Gson gson = new Gson()
+
     def MockMvc mockMvc
 
     def setup() {
@@ -70,9 +73,9 @@ public class ProposerControllerTest extends Specification {
 
     def testAcceptWithNoQuorum() {
         given:
-        Node firstNode = Node.builder().id(1).url("1001");
-        Node secondNode = Node.builder().id(2).url("1002");
-        Node thirdNode = Node.builder().id(3).url("1003");
+        Node firstNode = Node.builder().id(1).nodeUrl("1001").build();
+        Node secondNode = Node.builder().id(2).nodeUrl("1002").build();
+        Node thirdNode = Node.builder().id(3).nodeUrl("1003").build();
 
         Proposal proposal = Proposal.builder().id(1).value(5).server("1001").build()
         String proposalJson = gson.toJson(proposal)
@@ -83,8 +86,6 @@ public class ProposerControllerTest extends Specification {
         def response = mockMvc.perform(post(ACCEPTOR_URL).contentType(MediaType.APPLICATION_JSON).content(proposalJson)).andReturn().response
         def getAcceptedValueResponse = mockMvc.perform(get(ACCEPTOR_URL)).andReturn().response
 
-        verify(nodesRegistryRepository, times(1)).findAll();
-
         then: 'proposer controller should return ok status and appropriate value'
 
         response.status == OK.value()
@@ -94,9 +95,9 @@ public class ProposerControllerTest extends Specification {
 
     def testAcceptWithQuorum() {
         given:
-        Node firstNode = Node.builder().id(1).url("1001");
-        Node secondNode = Node.builder().id(2).url("1002");
-        Node thirdNode = Node.builder().id(3).url("1003");
+        Node firstNode = Node.builder().id(1).nodeUrl("1001").build();
+        Node secondNode = Node.builder().id(2).nodeUrl("1002").build();
+        Node thirdNode = Node.builder().id(3).nodeUrl("1003").build();
 
         Proposal proposal = Proposal.builder().id(1).value(5).server("1001").build()
         Proposal secondProposal = Proposal.builder().id(2).value(10).server("1002").build()
@@ -110,8 +111,6 @@ public class ProposerControllerTest extends Specification {
         def getAcceptedValueResponse = mockMvc.perform(get(ACCEPTOR_URL)).andReturn().response
         def secondResponse = mockMvc.perform(post(ACCEPTOR_URL).contentType(MediaType.APPLICATION_JSON).content(secondProposalJson)).andReturn().response
         def secondGetAcceptedValueResponse = mockMvc.perform(get(ACCEPTOR_URL)).andReturn().response
-
-        verify(nodesRegistryRepository, times(1)).findAll();
 
         then: 'proposer controller should return ok status and appropriate value'
 
