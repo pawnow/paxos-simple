@@ -19,9 +19,8 @@ public class LeaderService {
     private NodesRegistryRepository nodesRegistryRepository;
 
     public boolean isLeader(String url){
-        String localUrl = extractHostAndPortFromUrl(url);
         List<Node> nodes = Lists.newArrayList(nodesRegistryRepository.findAll());
-        Optional<Long> serverId = nodes.stream().filter(node -> node.getNodeUrl().equals(localUrl)).map(Node::getId).findAny();
+        Optional<Long> serverId = getServerId(nodes, url);
         if(!serverId.isPresent()){
             return false;
         }
@@ -38,6 +37,10 @@ public class LeaderService {
             }
         }
         return true;
+    }
+
+    public Optional<Long> getServerId(List<Node> nodes, String url){
+        return nodes.stream().filter(node -> node.getNodeUrl().equals(extractHostAndPortFromUrl(url))).map(Node::getId).findAny();
     }
 
     private String extractHostAndPortFromUrl(String url){

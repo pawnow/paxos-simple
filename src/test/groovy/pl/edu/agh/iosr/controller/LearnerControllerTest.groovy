@@ -28,7 +28,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return empty proposal'
         response.status == OK.value()
-        response.contentAsString == '{"id":null,"value":null}'
+        response.contentAsString == '{"id":null,"value":null,"server":null,"highestAcceptedProposalId":null}'
     }
 
     def testShouldLearnNewProposal() {
@@ -54,7 +54,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return learned value'
         response.status == OK.value()
-        response.contentAsString == '{"id":3,"value":15}'
+        response.contentAsString == '{"id":3,"value":15,"server":null,"highestAcceptedProposalId":null}'
     }
 
     def testShouldReturnEmptyProposalWhenNoValueLearned2() {
@@ -63,7 +63,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return empty proposal'
         response.status == OK.value()
-        response.contentAsString == '{"id":null,"value":null}'
+        response.contentAsString == '{"id":null,"value":null,"server":null,"highestAcceptedProposalId":null}'
     }
 
 }

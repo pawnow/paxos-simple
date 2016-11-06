@@ -11,10 +11,13 @@ import pl.edu.agh.iosr.cdm.Proposal
 import pl.edu.agh.iosr.cdm.Node
 import pl.edu.agh.iosr.service.LeaderService
 import pl.edu.agh.iosr.service.ProposerService
+import pl.edu.agh.iosr.service.QuorumProviderService
 import pl.edu.agh.iosr.utils.ApplicationEndpoints
 import spock.lang.Specification
 
 import static org.mockito.Matchers.any
+import static org.mockito.Matchers.eq
+import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -23,8 +26,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 public class ProposerControllerTest extends Specification {
 
-    public static final String PROPOSER_URL = ApplicationEndpoints.PROPOSER_URL.getEndpoint()
-    public static final String ACCEPTOR_URL = ApplicationEndpoints.ACCEPTOR_URL.getEndpoint()
+    public static final String PROPOSER_PROPOSE_URL = ApplicationEndpoints.PROPOSER_PROPOSE_URL.getEndpoint() + "?value=5"
+    public static final String PROPOSER_ACCEPT_URL = ApplicationEndpoints.PROPOSER_ACCEPT_URL.getEndpoint()
 
     @Mock
     LeaderService leaderService
@@ -34,6 +37,9 @@ public class ProposerControllerTest extends Specification {
 
     @Mock
     NodesRegistryRepository nodesRegistryRepository
+
+    @Mock
+    QuorumProviderService quorumProviderService
 
     @InjectMocks
     ProposerController controllerUnderTest
@@ -47,78 +53,78 @@ public class ProposerControllerTest extends Specification {
         mockMvc = standaloneSetup(controllerUnderTest).build()
     }
 
-    def testProposerReturnEmptyProposal() {
-        given:
-        when(leaderService.isLeader(any())).thenReturn(true)
-
-        when: 'rest propose url is hit'
-        def response = mockMvc.perform(get(PROPOSER_URL)).andReturn().response
-
-        then: 'proposer controller should return empty proposal'
-        response.status == OK.value()
-        response.contentAsString == '{"id":0,"value":null}'
-    }
-
     def testProposerReturnNullIfIsNotLeader() {
         given:
         when(leaderService.isLeader(any())).thenReturn(false)
 
         when: 'rest propose url is hit'
-        def response = mockMvc.perform(get(PROPOSER_URL)).andReturn().response
+        def response = mockMvc.perform(get(PROPOSER_PROPOSE_URL)).andReturn().response
 
         then: 'proposer controller should return empty proposal'
         response.status == OK.value()
         response.contentAsString == ''
     }
 
-    def testAcceptWithNoQuorum() {
+    def testProposeQuorum() {
         given:
         Node firstNode = Node.builder().id(1).nodeUrl("1001").build();
         Node secondNode = Node.builder().id(2).nodeUrl("1002").build();
         Node thirdNode = Node.builder().id(3).nodeUrl("1003").build();
+        def nodes = Arrays.asList(firstNode, secondNode, thirdNode)
+        def quorum = new HashMap<Node, Boolean>()
+        quorum.put(firstNode, false)
+        quorum.put(thirdNode, false)
 
-        Proposal proposal = Proposal.builder().id(1).value(5).server("1001").build()
-        String proposalJson = gson.toJson(proposal)
-
-        when(nodesRegistryRepository .findAll()).thenReturn(Collections.singletonList(firstNode)).thenReturn(Arrays.asList(firstNode, secondNode, thirdNode))
+        when(leaderService.isLeader(any(String.class))).thenReturn(true)
+        when(nodesRegistryRepository.findAll()).thenReturn(nodes)
+        when(leaderService.getServerId(eq(nodes), any(String.class))).thenReturn(Optional.of(1l))
+        when(quorumProviderService.getMinimalQuorum()).thenReturn(quorum)
+        when(proposerService.generateProposalId(any(String.class))).thenReturn(7l)
 
         when: 'rest accept url is hit'
-        def response = mockMvc.perform(post(ACCEPTOR_URL).contentType(MediaType.APPLICATION_JSON).content(proposalJson)).andReturn().response
-        def getAcceptedValueResponse = mockMvc.perform(get(ACCEPTOR_URL)).andReturn().response
+        def response = mockMvc.perform(post(PROPOSER_PROPOSE_URL)).andReturn().response
+        verify(proposerService).sendProposalToQuorum(eq(quorum), any(Proposal.class))
 
         then: 'proposer controller should return ok status and appropriate value'
-
         response.status == OK.value()
-        response.contentAsString == ''
-
+        response.contentAsString == '{"id":7,"value":null,"server":"http://localhost/proposer/propose","highestAcceptedProposalId":null}'
     }
 
-    def testAcceptWithQuorum() {
+    def testAcceptWithHighedIdFromQuorum() {
         given:
         Node firstNode = Node.builder().id(1).nodeUrl("1001").build();
         Node secondNode = Node.builder().id(2).nodeUrl("1002").build();
         Node thirdNode = Node.builder().id(3).nodeUrl("1003").build();
+        def nodes = Arrays.asList(firstNode, secondNode, thirdNode)
+        def quorum = new HashMap<Node, Boolean>()
+        quorum.put(firstNode, false)
+        quorum.put(thirdNode, false)
 
-        Proposal proposal = Proposal.builder().id(1).value(5).server("1001").build()
-        Proposal secondProposal = Proposal.builder().id(2).value(10).server("1002").build()
-        String proposalJson = gson.toJson(proposal)
-        String secondProposalJson = gson.toJson(secondProposal)
+        Proposal proposalFirst = Proposal.builder().id(5).value(8).server("1001").highestAcceptedProposalId(3).build()
+        String proposalJsonFirst = gson.toJson(proposalFirst)
+        Proposal proposalThird = Proposal.builder().id(5).value(6).server("1001").highestAcceptedProposalId(1).build()
+        String proposalJsonThird = gson.toJson(proposalThird)
 
-        when(nodesRegistryRepository .findAll()).thenReturn(Collections.singletonList(firstNode)).thenReturn(Arrays.asList(firstNode, secondNode, thirdNode))
+        when(leaderService.isLeader(any(String.class))).thenReturn(true)
+        when(nodesRegistryRepository.findAll()).thenReturn(nodes)
+        when(leaderService.getServerId(eq(nodes), any(String.class))).thenReturn(Optional.of(1l))
+        when(quorumProviderService.getMinimalQuorum()).thenReturn(quorum)
+        when(proposerService.checkForQuorum(any())).thenReturn(false).thenReturn(true)
+        when(proposerService.generateProposalId(any(String.class))).thenReturn(5l)
 
         when: 'rest accept url is hit'
-        def response = mockMvc.perform(post(ACCEPTOR_URL).contentType(MediaType.APPLICATION_JSON).content(proposalJson)).andReturn().response
-        def getAcceptedValueResponse = mockMvc.perform(get(ACCEPTOR_URL)).andReturn().response
-        def secondResponse = mockMvc.perform(post(ACCEPTOR_URL).contentType(MediaType.APPLICATION_JSON).content(secondProposalJson)).andReturn().response
-        def secondGetAcceptedValueResponse = mockMvc.perform(get(ACCEPTOR_URL)).andReturn().response
+        def response = mockMvc.perform(post(PROPOSER_PROPOSE_URL)).andReturn().response
+        def responseAccept = mockMvc.perform(post(PROPOSER_ACCEPT_URL).contentType(MediaType.APPLICATION_JSON).content(proposalJsonFirst)).andReturn().response
+        def responseAccept2 = mockMvc.perform(post(PROPOSER_ACCEPT_URL).contentType(MediaType.APPLICATION_JSON).content(proposalJsonThird)).andReturn().response
+        verify(proposerService).sendAccept(any(), any())
 
         then: 'proposer controller should return ok status and appropriate value'
-
         response.status == OK.value()
-        response.contentAsString == ''
-        secondResponse.status == OK.value()
-        secondResponse.contentAsString == '{"id":1,"value":10}'
-
+        response.contentAsString == '{"id":5,"value":null,"server":"http://localhost/proposer/propose","highestAcceptedProposalId":null}'
+        responseAccept.status == OK.value()
+        responseAccept.contentAsString == ''
+        responseAccept2.status == OK.value()
+        responseAccept2.contentAsString == '{"id":5,"value":8,"server":"1001","highestAcceptedProposalId":3}'
     }
 
 }
