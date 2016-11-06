@@ -14,6 +14,7 @@ public class Proposal {
     @Id
     private Long id;
     private Integer value;
+    private String server;
 
     public Proposal() {
     }

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.agh.iosr.cdm.NodesRegistryRepository;
@@ -11,6 +12,7 @@ import pl.edu.agh.iosr.cdm.Node;
 import pl.edu.agh.iosr.cdm.Proposal;
 import pl.edu.agh.iosr.cdm.ProposalRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,14 +31,22 @@ public class ProposerController {
 
     private static long id = 0;
 
-    private HashMap<Long, HashMap<Node, Boolean>> quorums = new HashMap<Long,  HashMap<Node, Boolean>>();
+    private HashMap<Long, HashMap<Node, Boolean>> quorums = new HashMap<>();
 
     @RequestMapping("/propose")
-    public Proposal propose() {
-
+    public Proposal propose(HttpServletRequest request) {
+        request.getLocalName();
         quorums.put(new Long(id++), getMinimalQuorum());
         logger.debug("created proposal with id: " + id);
-        return Proposal.builder().id(id).build();
+        long id = (int) (System.currentTimeMillis() / 1000L) % Lists.newArrayList(nodesRegistryRepository.findAll()).size() + Integer.valueOf(request.getLocalName());
+        return Proposal.builder().id(id).server(request.getLocalName()).build();
+
+    }
+
+    @RequestMapping("/accept")
+    public Proposal accept(@RequestBody Proposal proposal) {
+        HashMap<Node, Boolean> accepted = quorums.get(proposal.getId());
+        accepted.get(proposal.getServer());
 
     }
 
