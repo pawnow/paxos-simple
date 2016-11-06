@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.edu.agh.iosr.cdm.NodesRegistryRepository;
 import pl.edu.agh.iosr.cdm.Node;
@@ -43,12 +44,17 @@ public class ProposerController {
 
     private HashMap<Long, HashMap<Node, Boolean>> quorums = new HashMap<>();
 
+    private HashMap<Long, Proposal> bestProposal = new HashMap<>();
+
+    private Integer valueToSet;
+
     @Autowired
     private LeaderService leaderService;
 
     @RequestMapping("/propose")
-    public Proposal propose(HttpServletRequest request) {
+    public Proposal propose(HttpServletRequest request, @RequestParam("value") Integer value) {
         if(leaderService.isLeader(request.getRequestURL().toString())){
+            valueToSet = value;
             String url = request.getRequestURL().toString();
             url = url.split("//")[1].split("/")[0].split(":")[1];
             long id =  System.currentTimeMillis() / Lists.newArrayList(nodesRegistryRepository.findAll()).size() + Integer.valueOf(url);
@@ -67,13 +73,21 @@ public class ProposerController {
     @RequestMapping("/accept")
     public Proposal accept(@RequestBody Proposal proposal) {
         HashMap<Node, Boolean> accepted = quorums.get(proposal.getId());
+        Proposal currentBest = bestProposal.get(proposal.getId());
+        if(currentBest==null || (currentBest.getValue() < proposal.getValue())){
+                bestProposal.put(proposal.getId(), proposal);
+        }
         for(Node node : accepted.keySet()){
             if (node.getNodeUrl().equals(proposal.getServer())){
                 accepted.put(node, true);
             }
         }
-        if(proposerService.checkForQuorum(accepted, proposal)) {
-            return proposal;
+        if(proposerService.checkForQuorum(accepted)) {
+            if(currentBest == null){
+                currentBest = Proposal.builder().value(valueToSet).build();
+            }
+            proposerService.sendAccept(accepted, bestProposal.get(proposal.getId()));
+            return currentBest;
         } else {
             return null;
         }

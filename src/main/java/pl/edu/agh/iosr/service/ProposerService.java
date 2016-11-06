@@ -37,27 +37,31 @@ public class ProposerService {
         }
     }
 
-    public Boolean checkForQuorum(HashMap<Node, Boolean> quorum, Proposal proposal) {
+    public Boolean checkForQuorum(HashMap<Node, Boolean> quorum) {
         int totalSize = Lists.newArrayList(nodesRegistryRepository.findAll()).size();
         int acceptedSize = 0;
         Boolean flag = false;
-        RestTemplate restTemplate = new RestTemplate();
 
         for(Boolean accepted : quorum.values()){
             if (accepted)
                 acceptedSize++;
         }
         if (acceptedSize*2>totalSize){
+            flag = true;
 
-            for(Node node : quorum.keySet()){
-                flag = true;
-                if(quorum.get(node)){
-                    //TODO: Change to proper url once task has been completed
-                    restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_URL.getEndpoint(), proposal, String.class);
-                    logger.debug("Sending confirmation to accepter " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_URL.getEndpoint());
-                }
-            }
         }
         return flag;
+    }
+
+    public void sendAccept(HashMap<Node, Boolean> quorum, Proposal proposal){
+        RestTemplate restTemplate = new RestTemplate();
+        for(Node node : quorum.keySet()){
+            if(quorum.get(node)){
+                //TODO: Change to proper url once task has been completed
+                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_URL.getEndpoint(), proposal, String.class);
+                logger.debug("Sending confirmation to accepter " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_URL.getEndpoint());
+            }
+        }
+
     }
 }
