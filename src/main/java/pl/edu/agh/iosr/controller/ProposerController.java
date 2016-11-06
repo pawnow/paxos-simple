@@ -55,7 +55,6 @@ public class ProposerController {
             HashMap<Node, Boolean> quorum = quorumProviderService.getMinimalQuorum();
             quorums.put(new Long(id), quorum);
             logger.debug("created proposal with id: " + id);
-            //TODO: Proposal value?
             Proposal proposal = Proposal.builder().id(id).server(url).build();
             proposerService.sendProposalToQuorum(quorum, proposal);
             return proposal;
@@ -73,7 +72,10 @@ public class ProposerController {
                 accepted.put(node, true);
             }
         }
-        proposerService.checkForQuorum(accepted, proposal);
-        return proposal;
+        if(proposerService.checkForQuorum(accepted, proposal)) {
+            return proposal;
+        } else {
+            return null;
+        }
     }
 }
