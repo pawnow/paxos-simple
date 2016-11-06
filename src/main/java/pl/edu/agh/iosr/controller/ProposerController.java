@@ -16,6 +16,7 @@ import pl.edu.agh.iosr.service.LeaderService;
 import javax.servlet.http.HttpServletRequest;
 import pl.edu.agh.iosr.cdm.ProposalRepository;
 import pl.edu.agh.iosr.service.ProposerService;
+import pl.edu.agh.iosr.service.QuorumProviderService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
@@ -30,6 +31,9 @@ public class ProposerController {
 
     @Autowired
     private ProposerService proposerService;
+
+    @Autowired
+    private QuorumProviderService quorumProviderService;
 
     @Autowired
     private NodesRegistryRepository nodesRegistryRepository;
@@ -47,8 +51,8 @@ public class ProposerController {
         if(leaderService.isLeader(request.getRequestURL().toString())){
             String url = request.getRequestURL().toString();
             url = url.split("//")[1].split("/")[0].split(":")[1];
-            long id = (int) (System.currentTimeMillis() / 1000L) % Lists.newArrayList(nodesRegistryRepository.findAll()).size() + Integer.valueOf(url);
-            HashMap<Node, Boolean> quorum = getMinimalQuorum();
+            long id =  System.currentTimeMillis() / Lists.newArrayList(nodesRegistryRepository.findAll()).size() + Integer.valueOf(url);
+            HashMap<Node, Boolean> quorum = quorumProviderService.getMinimalQuorum();
             quorums.put(new Long(id), quorum);
             logger.debug("created proposal with id: " + id);
             //TODO: Proposal value?
@@ -69,28 +73,7 @@ public class ProposerController {
                 accepted.put(node, true);
             }
         }
-
-        return null;
-    }
-
-    private HashMap<Node, Boolean> getMinimalQuorum(){
-        List<Node> nodes = Lists.newArrayList(nodesRegistryRepository.findAll());
-        Collections.shuffle(nodes);
-        List<Node> nodesHalf = nodes.subList(0, (int) Math.floor(nodes.size()/2)+1);
-        HashMap<Node, Boolean> quorum = new HashMap<Node, Boolean>();
-        for(Node node : nodesHalf){
-            quorum.put(node, false);
-        }
-        return quorum;
-    }
-
-    private HashMap<Node, Boolean> getFullQuorum(){
-        List<Node> nodes = Lists.newArrayList(nodesRegistryRepository.findAll());
-        Collections.shuffle(nodes);
-        HashMap<Node, Boolean> quorum = new HashMap<Node, Boolean>();
-        for(Node node : nodes){
-            quorum.put(node, false);
-        }
-        return quorum;
+        proposerService.checkForQuorum(accepted, proposal);
+        return proposal;
     }
 }
