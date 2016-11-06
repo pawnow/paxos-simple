@@ -14,12 +14,14 @@ public class Proposal {
     @Id
     private Long id;
     private Integer value;
+    private String server;
 
     public Proposal() {
     }
 
-    public Proposal(Long id, Integer value) {
+    public Proposal(Long id, Integer value, String server) {
         this.id = id;
         this.value = value;
+        this.server = server;
     }
 }
