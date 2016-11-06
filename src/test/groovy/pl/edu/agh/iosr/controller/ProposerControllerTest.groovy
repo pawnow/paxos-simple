@@ -102,7 +102,7 @@ public class ProposerControllerTest extends Specification {
 
         Proposal proposalFirst = Proposal.builder().id(5).value(8).server("1001").highestAcceptedProposalId(3).build()
         String proposalJsonFirst = gson.toJson(proposalFirst)
-        Proposal proposalThird = Proposal.builder().id(5).value(6).server("1001").highestAcceptedProposalId(1).build()
+        Proposal proposalThird = Proposal.builder().id(5).value(6).server("1003").highestAcceptedProposalId(1).build()
         String proposalJsonThird = gson.toJson(proposalThird)
 
         when(leaderService.isLeader(any(String.class))).thenReturn(true)
@@ -125,6 +125,43 @@ public class ProposerControllerTest extends Specification {
         responseAccept.contentAsString == ''
         responseAccept2.status == OK.value()
         responseAccept2.contentAsString == '{"id":5,"value":8,"server":"1001","highestAcceptedProposalId":3}'
+    }
+
+    def testAcceptWithWithProposalValueFromClient() {
+        given:
+        Node firstNode = Node.builder().id(1).nodeUrl("1001").build();
+        Node secondNode = Node.builder().id(2).nodeUrl("1002").build();
+        Node thirdNode = Node.builder().id(3).nodeUrl("1003").build();
+        def nodes = Arrays.asList(firstNode, secondNode, thirdNode)
+        def quorum = new HashMap<Node, Boolean>()
+        quorum.put(firstNode, false)
+        quorum.put(thirdNode, false)
+
+        Proposal proposalFirst = Proposal.builder().id(5).server("1001").build()
+        String proposalJsonFirst = gson.toJson(proposalFirst)
+        Proposal proposalThird = Proposal.builder().id(5).server("1003").build()
+        String proposalJsonThird = gson.toJson(proposalThird)
+
+        when(leaderService.isLeader(any(String.class))).thenReturn(true)
+        when(nodesRegistryRepository.findAll()).thenReturn(nodes)
+        when(leaderService.getServerId(eq(nodes), any(String.class))).thenReturn(Optional.of(1l))
+        when(quorumProviderService.getMinimalQuorum()).thenReturn(quorum)
+        when(proposerService.checkForQuorum(any())).thenReturn(false).thenReturn(true)
+        when(proposerService.generateProposalId(any(String.class))).thenReturn(5l)
+
+        when: 'rest accept url is hit'
+        def response = mockMvc.perform(post(PROPOSER_PROPOSE_URL)).andReturn().response
+        def responseAccept = mockMvc.perform(post(PROPOSER_ACCEPT_URL).contentType(MediaType.APPLICATION_JSON).content(proposalJsonFirst)).andReturn().response
+        def responseAccept2 = mockMvc.perform(post(PROPOSER_ACCEPT_URL).contentType(MediaType.APPLICATION_JSON).content(proposalJsonThird)).andReturn().response
+        verify(proposerService).sendAccept(any(), any())
+
+        then: 'proposer controller should return ok status and appropriate value'
+        response.status == OK.value()
+        response.contentAsString == '{"id":5,"value":null,"server":"http://localhost/proposer/propose","highestAcceptedProposalId":null}'
+        responseAccept.status == OK.value()
+        responseAccept.contentAsString == ''
+        responseAccept2.status == OK.value()
+        responseAccept2.contentAsString == '{"id":5,"value":5,"server":null,"highestAcceptedProposalId":null}'
     }
 
 }

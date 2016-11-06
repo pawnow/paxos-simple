@@ -66,13 +66,13 @@ public class ProposerController {
     public Proposal accept(@RequestBody Proposal proposal) {
         HashMap<Node, Boolean> accepted = quorums.get(proposal.getId());
         Proposal currentBest = bestProposal.get(proposal.getId());
-        if(currentBest==null || (currentBest.getHighestAcceptedProposalId() < proposal.getHighestAcceptedProposalId())){
+        if(proposal.getHighestAcceptedProposalId()!=null && (currentBest==null || (currentBest.getHighestAcceptedProposalId() < proposal.getHighestAcceptedProposalId()))){
                 bestProposal.put(proposal.getId(), proposal);
         }
         accepted.keySet().stream().filter(node -> node.getNodeUrl().equals(proposal.getServer())).forEach(node -> accepted.put(node, true));
         if(proposerService.checkForQuorum(accepted)) {
             if(currentBest == null){
-                currentBest = Proposal.builder().value(valueToSet).build();
+                currentBest = Proposal.builder().id(proposal.getId()).value(valueToSet).build();
             }
             proposerService.sendAccept(accepted, bestProposal.get(proposal.getId()));
             return currentBest;
