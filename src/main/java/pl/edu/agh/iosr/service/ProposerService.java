@@ -12,6 +12,8 @@ import pl.edu.agh.iosr.cdm.Proposal;
 import pl.edu.agh.iosr.utils.ApplicationEndpoints;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Szymon on 2016-11-06.
@@ -23,13 +25,16 @@ public class ProposerService {
     @Autowired
     private NodesRegistryRepository nodesRegistryRepository;
 
+    @Autowired
+    private LeaderService leaderService;
+
     public void sendProposalToQuorum(HashMap<Node, Boolean> quorum, Proposal proposal){
 
         RestTemplate restTemplate = new RestTemplate();
         for(Node node: quorum.keySet()){
             try {
-                logger.debug("Sending proposal to accepter " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_URL.getEndpoint());
-                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_URL.getEndpoint(), proposal, String.class);
+                logger.debug("Sending proposal to accepter " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_PROPOSE_URL.getEndpoint());
+                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_PROPOSE_URL.getEndpoint(), proposal, String.class);
             } catch (Exception e){
                 e.printStackTrace();
                 logger.error("Error during sending proposal to quorum");
@@ -55,13 +60,15 @@ public class ProposerService {
 
     public void sendAccept(HashMap<Node, Boolean> quorum, Proposal proposal){
         RestTemplate restTemplate = new RestTemplate();
-        for(Node node : quorum.keySet()){
-            if(quorum.get(node)){
-                //TODO: Change to proper url once task has been completed
-                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_URL.getEndpoint(), proposal, String.class);
-                logger.debug("Sending confirmation to accepter " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_URL.getEndpoint());
-            }
-        }
+        quorum.keySet().stream().filter(quorum::get).forEach(node -> {
+            restTemplate.postForObject("http://" + node.getNodeUrl() + ApplicationEndpoints.ACCEPTOR_ACCEPT_URL.getEndpoint(), proposal, String.class);
+            logger.debug("Sending confirmation to accepter " + "http://" + node.getNodeUrl() + ApplicationEndpoints.ACCEPTOR_ACCEPT_URL.getEndpoint());
+        });
+    }
 
+    public long generateProposalId(String url){
+        List<Node> nodes = Lists.newArrayList(nodesRegistryRepository.findAll());
+        Optional<Long> serverId = leaderService.getServerId(nodes, url);
+        return System.currentTimeMillis() / nodes.size() + serverId.get();
     }
 }

@@ -12,7 +12,6 @@ public class FaultService {
     private static Boolean isDown = false;
 
     public Boolean isDown() {
-        //pytanie: synchronized konieczne??
         synchronized (isDown){
             return isDown;
         }

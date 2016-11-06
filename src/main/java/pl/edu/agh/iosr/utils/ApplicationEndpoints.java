@@ -1,10 +1,12 @@
 package pl.edu.agh.iosr.utils;
 
 public enum ApplicationEndpoints {
-    ACCEPTOR_URL("/acceptor/accept"),
+    ACCEPTOR_PROPOSE_URL("/acceptor/propose"),
+    ACCEPTOR_ACCEPT_URL("/acceptor/accept"),
     LERNER_URL("/learner/learn"),
     ONLINE_URL("/utils/status"),
-    PROPOSER_URL("/proposer/propose");
+    PROPOSER_PROPOSE_URL("/proposer/propose"),
+    PROPOSER_ACCEPT_URL("/proposer/accept");
 
     private final String endpoint;
 
@@ -13,6 +15,11 @@ public enum ApplicationEndpoints {
     }
 
     public String getEndpoint() {
+        return endpoint;
+    }
+
+    @Override
+    public String toString() {
         return endpoint;
     }
 }
