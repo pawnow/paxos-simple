@@ -28,7 +28,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return empty proposal'
         response.status == OK.value()
-        response.contentAsString == '{"id":null,"value":null,"server":null,"highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":null,"key":null,"value":null,"server":null,"highestAcceptedProposalId":null}'
     }
 
     def testShouldLearnNewProposal() {
@@ -45,7 +45,7 @@ public class LearnerControllerTest extends Specification {
 
     def testShouldReturnLearnedProposal() {
         given:
-        Proposal proposal = Proposal.builder().id(3).value(15).build()
+        Proposal proposal = Proposal.builder().id(3).key("key-3").value(15).build()
 
         String json = gson.toJson(proposal);
         when: 'rest learn url is hit'
@@ -54,7 +54,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return learned value'
         response.status == OK.value()
-        response.contentAsString == '{"id":3,"value":15,"server":null,"highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":3,"key":"key-3","value":15,"server":null,"highestAcceptedProposalId":null}'
     }
 
     def testShouldReturnEmptyProposalWhenNoValueLearned2() {
@@ -63,7 +63,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return empty proposal'
         response.status == OK.value()
-        response.contentAsString == '{"id":null,"value":null,"server":null,"highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":null,"key":null,"value":null,"server":null,"highestAcceptedProposalId":null}'
     }
 
 }

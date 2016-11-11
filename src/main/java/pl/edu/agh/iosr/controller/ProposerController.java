@@ -53,7 +53,7 @@ public class ProposerController {
             long id = proposerService.generateProposalId(url);
             quorums.put(id, quorum);
             logger.debug("created proposal with id: " + id);
-            Proposal proposal = Proposal.builder().id(id).server(url).build();
+            Proposal proposal = Proposal.builder().id(id).key("key-"+id).server(url).build();
             proposerService.sendProposalToQuorum(quorum, proposal);
             return proposal;
         }

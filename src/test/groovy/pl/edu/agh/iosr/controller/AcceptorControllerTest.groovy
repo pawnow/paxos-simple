@@ -54,7 +54,7 @@ public class AcceptorControllerTest extends Specification {
 
     def testProposeShouldAcceptNewProposalAndReturnEmptyProposal() {
         given:
-        Proposal proposal = Proposal.builder().id(1).value(10).build()
+        Proposal proposal = Proposal.builder().id(1).key('key-1').value(10).build()
         Gson gson = new Gson()
         String json = gson.toJson(proposal)
         when(proposalRepository.getByMaxId()).thenReturn(Optional.empty())
@@ -72,14 +72,14 @@ public class AcceptorControllerTest extends Specification {
         response.status == OK.value()
         response.contentAsString == ''
         getAcceptedValueResponse.status == OK.value()
-        getAcceptedValueResponse.contentAsString == '[{"id":1,"value":10,"server":null,"highestAcceptedProposalId":null}]'
+        getAcceptedValueResponse.contentAsString == '[{"id":1,"key":"key-1","value":10,"server":null,"highestAcceptedProposalId":null}]'
 
     }
 
     def testProposeShouldNotAcceptNewProposalWhenPreviouslyAcceptedProposalWithHigherId() {
         given:
-        Proposal proposal = Proposal.builder().id(2).value(5).build()
-        Proposal secondProposal = Proposal.builder().id(1).value(10).build()
+        Proposal proposal = Proposal.builder().id(2).key("key-2").value(5).build()
+        Proposal secondProposal = Proposal.builder().id(1).key("key-1").value(10).build()
         String proposalJson = gson.toJson(proposal)
         String secondProposalJson = gson.toJson(secondProposal)
 
@@ -100,18 +100,18 @@ public class AcceptorControllerTest extends Specification {
         response.status == OK.value()
         response.contentAsString == ''
         getAcceptedValueResponse.status == OK.value()
-        getAcceptedValueResponse.contentAsString == '[{"id":2,"value":5,"server":null,"highestAcceptedProposalId":null}]'
+        getAcceptedValueResponse.contentAsString == '[{"id":2,"key":"key-2","value":5,"server":null,"highestAcceptedProposalId":null}]'
         secondResponse.status == OK.value()
         secondResponse.contentAsString == ''
         secondGetAcceptedValueResponse.status == OK.value()
-        secondGetAcceptedValueResponse.contentAsString == '[{"id":2,"value":5,"server":null,"highestAcceptedProposalId":null}]'
+        secondGetAcceptedValueResponse.contentAsString == '[{"id":2,"key":"key-2","value":5,"server":null,"highestAcceptedProposalId":null}]'
 
     }
 
     def testProposeShouldNotAcceptNewProposalWhenPreviouslyAcceptedProposalWithSameId() {
         given:
-        Proposal proposal = Proposal.builder().id(1).value(7).build()
-        Proposal secondProposal = Proposal.builder().id(1).value(10).build()
+        Proposal proposal = Proposal.builder().id(1).key("key-1").value(7).build()
+        Proposal secondProposal = Proposal.builder().id(1).key("key-1").value(10).build()
         String proposalJson = gson.toJson(proposal)
         String secondProposalJson = gson.toJson(secondProposal)
 
@@ -132,17 +132,17 @@ public class AcceptorControllerTest extends Specification {
         response.status == OK.value()
         response.contentAsString == ''
         getAcceptedValueResponse.status == OK.value()
-        getAcceptedValueResponse.contentAsString == '[{"id":1,"value":7,"server":null,"highestAcceptedProposalId":null}]'
+        getAcceptedValueResponse.contentAsString == '[{"id":1,"key":"key-1","value":7,"server":null,"highestAcceptedProposalId":null}]'
         secondResponse.status == OK.value()
         secondResponse.contentAsString == ''
         secondGetAcceptedValueResponse.status == OK.value()
-        secondGetAcceptedValueResponse.contentAsString == '[{"id":1,"value":7,"server":null,"highestAcceptedProposalId":null}]'
+        secondGetAcceptedValueResponse.contentAsString == '[{"id":1,"key":"key-1","value":7,"server":null,"highestAcceptedProposalId":null}]'
     }
 
     def testProposeShouldAcceptNewProposalWhenPreviouslyAcceptedProposalWithLowerId() {
         given:
-        Proposal proposal = Proposal.builder().id(1).value(20).build()
-        Proposal secondProposal = Proposal.builder().id(2).value(18).build()
+        Proposal proposal = Proposal.builder().id(1).key("key-1").value(20).build()
+        Proposal secondProposal = Proposal.builder().id(2).key("key-2").value(18).build()
         String proposalJson = gson.toJson(proposal)
         String secondProposalJson = gson.toJson(secondProposal)
 
@@ -164,16 +164,16 @@ public class AcceptorControllerTest extends Specification {
         response.status == OK.value()
         response.contentAsString == ''
         getAcceptedValueResponse.status == OK.value()
-        getAcceptedValueResponse.contentAsString == '[{"id":1,"value":20,"server":null,"highestAcceptedProposalId":null}]'
+        getAcceptedValueResponse.contentAsString == '[{"id":1,"key":"key-1","value":20,"server":null,"highestAcceptedProposalId":null}]'
         secondResponse.status == OK.value()
-        secondResponse.contentAsString == '{"id":1,"value":20,"server":null,"highestAcceptedProposalId":null}'
+        secondResponse.contentAsString == '{"id":1,"key":"key-1","value":20,"server":null,"highestAcceptedProposalId":null}'
         secondGetAcceptedValueResponse.status == OK.value()
-        secondGetAcceptedValueResponse.contentAsString == '[{"id":1,"value":20,"server":null,"highestAcceptedProposalId":null},{"id":2,"value":18,"server":null,"highestAcceptedProposalId":null}]'
+        secondGetAcceptedValueResponse.contentAsString == '[{"id":1,"key":"key-1","value":20,"server":null,"highestAcceptedProposalId":null},{"id":2,"key":"key-2","value":18,"server":null,"highestAcceptedProposalId":null}]'
     }
 
     def testAcceptShouldAcceptNewProposalAndReturnEmptyProposal() {
         given:
-        Proposal proposal = Proposal.builder().id(1).value(10).build()
+        Proposal proposal = Proposal.builder().id(1).key("key-1").value(10).build()
         Gson gson = new Gson()
         String json = gson.toJson(proposal)
         when(proposalRepository.getByMaxId()).thenReturn(Optional.empty())
@@ -238,7 +238,7 @@ public class AcceptorControllerTest extends Specification {
 
     def testAcceptShouldAcceptNewProposalWhenPreviouslyAcceptedProposalWithLowerId() {
         given:
-        Proposal proposal = Proposal.builder().id(1).value(20).build()
+        Proposal proposal = Proposal.builder().id(1).key("key-1").value(20).build()
         Proposal secondProposal = Proposal.builder().id(2).value(18).build()
         String proposalJson = gson.toJson(proposal)
         String secondProposalJson = gson.toJson(secondProposal)
@@ -256,7 +256,7 @@ public class AcceptorControllerTest extends Specification {
         response.status == OK.value()
         response.contentAsString == ''
         secondResponse.status == OK.value()
-        secondResponse.contentAsString == '{"id":1,"value":20,"server":null,"highestAcceptedProposalId":null}'
+        secondResponse.contentAsString == '{"id":1,"key":"key-1","value":20,"server":null,"highestAcceptedProposalId":null}'
     }
 
 }
