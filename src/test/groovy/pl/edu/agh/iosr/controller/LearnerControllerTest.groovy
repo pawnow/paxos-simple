@@ -1,8 +1,12 @@
 package pl.edu.agh.iosr.controller
 
 import com.google.gson.Gson
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import pl.edu.agh.iosr.cdm.AcceptedProposalRepository
 import pl.edu.agh.iosr.cdm.Proposal
 import pl.edu.agh.iosr.utils.ApplicationEndpoints
 import spock.lang.Specification
@@ -18,8 +22,15 @@ public class LearnerControllerTest extends Specification {
     def Gson gson = new Gson()
     MockMvc mockMvc;
 
+    @Mock
+    AcceptedProposalRepository acceptedProposalRepository;
+
+    @InjectMocks
+    LearnerController learnerController;
+
     def setup() {
-        mockMvc = standaloneSetup(new LearnerController()).build();
+        MockitoAnnotations.initMocks(this);
+        mockMvc = standaloneSetup(learnerController).build()
     }
 
     def testShouldReturnEmptyProposalWhenNoValueLearned() {
