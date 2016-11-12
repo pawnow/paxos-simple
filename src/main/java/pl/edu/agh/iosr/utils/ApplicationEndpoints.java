@@ -6,7 +6,9 @@ public enum ApplicationEndpoints {
     LERNER_URL("/learner/learn"),
     ONLINE_URL("/utils/status"),
     PROPOSER_PROPOSE_URL("/proposer/propose"),
-    PROPOSER_ACCEPT_URL("/proposer/accept");
+    PROPOSER_ACCEPT_URL("/proposer/accept"),
+    LEARNER_CLEAN_URL("/learner/clean"),
+    PROPOSER_CLEAN_URL("proposer/clean");
 
     private final String endpoint;
 

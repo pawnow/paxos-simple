@@ -3,10 +3,7 @@ package pl.edu.agh.iosr.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.iosr.cdm.Node;
 import pl.edu.agh.iosr.cdm.Proposal;
 import pl.edu.agh.iosr.service.LeaderService;
@@ -75,6 +72,13 @@ public class ProposerController {
         } else {
             return null;
         }
+    }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/clean")
+    public void clean(){
+        quorums = new HashMap<>();
+        bestProposal = new HashMap<>();
+        valueToSet = 0;
+        logger.info("ProposerController state has been reset");
     }
 }

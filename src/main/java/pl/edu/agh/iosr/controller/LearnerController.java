@@ -40,4 +40,10 @@ public class LearnerController {
         return Optional.ofNullable(learnedProposal
                 .get(key)).orElseGet(() -> AcceptedProposal.builder().build());
     }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/clean")
+    public void clean(){
+        learnedProposal = new HashMap<>();
+        logger.info("LearnerController state has been reset");
+    }
 }
