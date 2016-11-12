@@ -10,6 +10,7 @@ import pl.edu.agh.iosr.cdm.Node;
 import pl.edu.agh.iosr.cdm.NodesRegistryRepository;
 import pl.edu.agh.iosr.cdm.Proposal;
 import pl.edu.agh.iosr.controller.LearnerController;
+import pl.edu.agh.iosr.utils.ApplicationEndpoints;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class AcceptorService {
 
     final static Logger logger = LoggerFactory.getLogger(AcceptorService.class);
+
     @Autowired
     private NodesRegistryRepository nodesRegistryRepository;
 
@@ -27,18 +29,27 @@ public class AcceptorService {
         RestTemplate restTemplate = new RestTemplate();
         List<Node> nodes = Lists.newArrayList(nodesRegistryRepository.findAll());
         for (Node node : nodes){
-
             try {
-                logger.debug("Sending to learner " + "http://" +node.getNodeUrl()+ LearnerController.LEARN_URL);
-                restTemplate.postForObject("http://" +node.getNodeUrl()+ LearnerController.LEARN_URL, proposal, String.class);
-                //// TODO: 05.11.16 : proposer?
-
-            } catch (Exception e){ //todo: timeout exception??
+                logger.debug("Sending learned proposal to learner " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.LERNER_URL);
+                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.LERNER_URL, proposal, String.class);
+                logger.debug("Sending learned proposal to proposer " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL);
+                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL, proposal, String.class);
+            } catch (Exception e){
               e.printStackTrace();
             }
-
         }
-
     }
 
+    public void informProposers(Proposal proposal){
+        RestTemplate restTemplate = new RestTemplate();
+        List<Node> nodes = Lists.newArrayList(nodesRegistryRepository.findAll());
+        for (Node node : nodes){
+            try {
+                logger.debug("Sending accept to proposer " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL);
+                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL, proposal, String.class);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -188,6 +188,7 @@ public class AcceptorControllerTest extends Specification {
         def response = mockMvc.perform(post(ACCEPTOR_ACCEPT_URL).contentType(MediaType.APPLICATION_JSON).content(json)).andReturn().response
 
         verify(proposalRepository, times(1)).getByMaxIdForKey('abc');
+        verify(acceptorService, times(1)).informLearnersAndProposers(proposal);
 
         then: 'acceptor controller should return ok status and appropriate value'
         response.status == OK.value()
@@ -209,6 +210,7 @@ public class AcceptorControllerTest extends Specification {
         def secondResponse = mockMvc.perform(post(ACCEPTOR_ACCEPT_URL).contentType(MediaType.APPLICATION_JSON).content(secondProposalJson)).andReturn().response
 
         verify(proposalRepository, times(2)).getByMaxIdForKey('abc');
+        verify(acceptorService, times(1)).informLearnersAndProposers(proposal);
 
         then: 'acceptor controller should return ok status and appropriate value'
         response.status == OK.value()
@@ -233,6 +235,7 @@ public class AcceptorControllerTest extends Specification {
         def secondResponse = mockMvc.perform(post(ACCEPTOR_ACCEPT_URL).contentType(MediaType.APPLICATION_JSON).content(secondProposalJson)).andReturn().response
 
         verify(proposalRepository, times(2)).getByMaxIdForKey('abc');
+        verify(acceptorService, times(1)).informLearnersAndProposers(proposal);
 
         then: 'acceptor controller should return ok status and appropriate value'
         response.status == OK.value()
@@ -256,6 +259,8 @@ public class AcceptorControllerTest extends Specification {
         def secondResponse = mockMvc.perform(post(ACCEPTOR_ACCEPT_URL).contentType(MediaType.APPLICATION_JSON).content(secondProposalJson)).andReturn().response
 
         verify(proposalRepository, times(2)).getByMaxIdForKey('abc');
+        verify(acceptorService, times(1)).informLearnersAndProposers(proposal);
+        verify(acceptorService, times(1)).informLearnersAndProposers(secondProposal);
 
         then: 'acceptor controller should return ok status and appropriate value'
         response.status == OK.value()
