@@ -16,6 +16,7 @@ public class Node {
 
     @Id
     private Long id;
+
     private String nodeUrl;
 
     public Node() {

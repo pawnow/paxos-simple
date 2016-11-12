@@ -1,35 +1,44 @@
 package pl.edu.agh.iosr.controller;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import pl.edu.agh.iosr.cdm.AcceptedProposal;
+import pl.edu.agh.iosr.cdm.AcceptedProposalRepository;
 import pl.edu.agh.iosr.cdm.Proposal;
-import pl.edu.agh.iosr.service.AcceptorService;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/learner")
 @RestController
 public class LearnerController {
 
+    @Autowired
+    AcceptedProposalRepository acceptedProposalRepository;
+
+    private Map<String, AcceptedProposal> learnedProposal = new HashMap<>();
+
     final static Logger logger = LoggerFactory.getLogger(LearnerController.class);
-
-    public static final String LEARN_URL = "/learner/learn";
-
-    private Optional<Proposal> learnedProposal = Optional.empty();
 
     @RequestMapping(method = RequestMethod.POST, value = "/learn")
     public void learn(@RequestBody Proposal proposal) {
-        logger.debug("learn: "+proposal.toString());
-        //// TODO: 05.11.16 implement learner here
-        learnedProposal = Optional.ofNullable(proposal);
+        logger.info("Learned new value: " + proposal);
+        AcceptedProposal acceptedProposal = new AcceptedProposal(proposal);
+        acceptedProposalRepository.save(acceptedProposal);
+        learnedProposal.put(proposal.getKey(), acceptedProposal);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/learn")
-    public Proposal getLearnedValue() {
-        return learnedProposal.orElseGet(() -> Proposal.builder().build());
+    public List<AcceptedProposal> getLearnedValue() {
+        return Lists.newArrayList(learnedProposal.values());
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/learn/{key}")
+    public AcceptedProposal getLearnedValue(@PathVariable(name = "key") String key) {
+        return Optional.ofNullable(learnedProposal
+                .get(key)).orElseGet(() -> AcceptedProposal.builder().build());
     }
 }
