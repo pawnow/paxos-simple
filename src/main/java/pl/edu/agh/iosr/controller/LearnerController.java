@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @RestController
 public class LearnerController {
 
+    public static final String LEARN_URL = "/learner/learn";
     @Autowired
     AcceptedProposalRepository acceptedProposalRepository;
 
