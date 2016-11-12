@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 public class ProposerControllerTest extends Specification {
 
-    public static final String PROPOSER_PROPOSE_URL = ApplicationEndpoints.PROPOSER_PROPOSE_URL.getEndpoint() + "?value=5"
+    public static final String PROPOSER_PROPOSE_URL = ApplicationEndpoints.PROPOSER_PROPOSE_URL.getEndpoint() + "?value=5&key=abc"
     public static final String PROPOSER_ACCEPT_URL = ApplicationEndpoints.PROPOSER_ACCEPT_URL.getEndpoint()
 
     @Mock
@@ -87,7 +87,7 @@ public class ProposerControllerTest extends Specification {
 
         then: 'proposer controller should return ok status and appropriate value'
         response.status == OK.value()
-        response.contentAsString == '{"id":7,"key":"key-7","value":null,"server":"http://localhost/proposer/propose","highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":7,"key":"abc","value":null,"server":"http://localhost/proposer/propose","highestAcceptedProposalId":null}'
     }
 
     def testAcceptWithHighedIdFromQuorum() {
@@ -100,9 +100,9 @@ public class ProposerControllerTest extends Specification {
         quorum.put(firstNode, false)
         quorum.put(thirdNode, false)
 
-        Proposal proposalFirst = Proposal.builder().id(5).key("key-5").value(8).server("1001").highestAcceptedProposalId(3).build()
+        Proposal proposalFirst = Proposal.builder().id(5).key("abc").value(8).server("1001").highestAcceptedProposalId(3).build()
         String proposalJsonFirst = gson.toJson(proposalFirst)
-        Proposal proposalThird = Proposal.builder().id(5).key("key-5").value(6).server("1003").highestAcceptedProposalId(1).build()
+        Proposal proposalThird = Proposal.builder().id(5).key("abc").value(6).server("1003").highestAcceptedProposalId(1).build()
         String proposalJsonThird = gson.toJson(proposalThird)
 
         when(leaderService.isLeader(any(String.class))).thenReturn(true)
@@ -120,11 +120,11 @@ public class ProposerControllerTest extends Specification {
 
         then: 'proposer controller should return ok status and appropriate value'
         response.status == OK.value()
-        response.contentAsString == '{"id":5,"key":"key-5","value":null,"server":"http://localhost/proposer/propose","highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":5,"key":"abc","value":null,"server":"http://localhost/proposer/propose","highestAcceptedProposalId":null}'
         responseAccept.status == OK.value()
         responseAccept.contentAsString == ''
         responseAccept2.status == OK.value()
-        responseAccept2.contentAsString == '{"id":5,"key":"key-5","value":8,"server":"1001","highestAcceptedProposalId":3}'
+        responseAccept2.contentAsString == '{"id":5,"key":"abc","value":8,"server":"1001","highestAcceptedProposalId":3}'
     }
 
     def testAcceptWithWithProposalValueFromClient() {
@@ -137,9 +137,9 @@ public class ProposerControllerTest extends Specification {
         quorum.put(firstNode, false)
         quorum.put(thirdNode, false)
 
-        Proposal proposalFirst = Proposal.builder().id(5).key("key-5").server("1001").build()
+        Proposal proposalFirst = Proposal.builder().id(5).key("abc").server("1001").build()
         String proposalJsonFirst = gson.toJson(proposalFirst)
-        Proposal proposalThird = Proposal.builder().id(5).key("key-5").server("1003").build()
+        Proposal proposalThird = Proposal.builder().id(5).key("abc").server("1003").build()
         String proposalJsonThird = gson.toJson(proposalThird)
 
         when(leaderService.isLeader(any(String.class))).thenReturn(true)
@@ -157,12 +157,11 @@ public class ProposerControllerTest extends Specification {
 
         then: 'proposer controller should return ok status and appropriate value'
         response.status == OK.value()
-        response.contentAsString == '{"id":5,"key":"key-5","value":null,"server":"http://localhost/proposer/propose","highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":5,"key":"abc","value":null,"server":"http://localhost/proposer/propose","highestAcceptedProposalId":null}'
         responseAccept.status == OK.value()
         responseAccept.contentAsString == ''
         responseAccept2.status == OK.value()
-        //tu coś nie bangla, key = null
-        responseAccept2.contentAsString == '{"id":5,"key":"key-5","value":5,"server":null,"highestAcceptedProposalId":null}'
+        responseAccept2.contentAsString == '{"id":5,"key":"abc","value":5,"server":null,"highestAcceptedProposalId":null}'
     }
 
 }

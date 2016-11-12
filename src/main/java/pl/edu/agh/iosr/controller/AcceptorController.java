@@ -5,10 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.agh.iosr.cdm.Proposal;
 import pl.edu.agh.iosr.cdm.ProposalRepository;
 
@@ -31,9 +28,15 @@ public class AcceptorController {
     }
 
     @Transactional
+    @RequestMapping(method = RequestMethod.GET, value = "/propose/{key}")
+    public List<Proposal> getAcceptedProposalForKey(@PathVariable(value="key") String key) {
+        return proposalRepository.getProposalsForKey(key);
+    }
+
+    @Transactional
     @RequestMapping(method = RequestMethod.POST, value = "/propose")
     public Proposal propose(@RequestBody Proposal newProposal) {
-        Optional<Proposal> previouslyAcceptedProposal = proposalRepository.getByMaxId();
+        Optional<Proposal> previouslyAcceptedProposal = Optional.ofNullable(proposalRepository.getByMaxIdForKey(newProposal.getKey()));
         if (shouldAccept(newProposal, previouslyAcceptedProposal)) {
             acceptNewProposal(newProposal);
             logger.info("Accepted proposal propose: " + newProposal);
@@ -46,7 +49,7 @@ public class AcceptorController {
     @Transactional
     @RequestMapping(method = RequestMethod.POST, value = "/accept")
     public Proposal accept(@RequestBody Proposal newProposal) {
-        Optional<Proposal> previouslyAcceptedProposal = proposalRepository.getByMaxId();
+        Optional<Proposal> previouslyAcceptedProposal = Optional.ofNullable(proposalRepository.getByMaxIdForKey(newProposal.getKey()));
         if (shouldAccept(newProposal, previouslyAcceptedProposal)) {
             logger.info("Accepted proposal accept: " + newProposal);
             return previouslyAcceptedProposal.orElseGet(() -> null);

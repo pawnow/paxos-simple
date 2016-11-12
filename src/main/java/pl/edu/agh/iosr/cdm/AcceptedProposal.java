@@ -18,15 +18,17 @@ public class AcceptedProposal {
     private Integer value;
     private String server;
     private Integer highestAcceptedProposalId;
+    private String key;
 
     public AcceptedProposal() {
     }
 
-    public AcceptedProposal(Long id, Integer value, String server, Integer highestAcceptedProposalId) {
+    public AcceptedProposal(Long id, Integer value, String server, Integer highestAcceptedProposalId, String key) {
         this.id = id;
         this.value = value;
         this.server = server;
         this.highestAcceptedProposalId = highestAcceptedProposalId;
+        this.key = key;
     }
 
     public AcceptedProposal(Proposal proposal){
@@ -34,5 +36,6 @@ public class AcceptedProposal {
         value = proposal.getValue();
         server = proposal.getServer();
         highestAcceptedProposalId = proposal.getHighestAcceptedProposalId();
+        key = proposal.getKey();
     }
 }

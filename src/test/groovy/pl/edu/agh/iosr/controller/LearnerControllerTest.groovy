@@ -18,7 +18,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 public class LearnerControllerTest extends Specification {
 
-    public static final String LEARNED_URL = ApplicationEndpoints.LERNER_URL.getEndpoint()
+    public static final String LEARNED_POST_URL = ApplicationEndpoints.LERNER_URL.getEndpoint()
+    public static final String LEARNED_URL = ApplicationEndpoints.LERNER_URL.getEndpoint() + "/abc"
     def Gson gson = new Gson()
     MockMvc mockMvc;
 
@@ -39,7 +40,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return empty proposal'
         response.status == OK.value()
-        response.contentAsString == '{"id":null,"key":null,"value":null,"server":null,"highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":null,"value":null,"server":null,"highestAcceptedProposalId":null,"key":null}'
     }
 
     def testShouldLearnNewProposal() {
@@ -48,7 +49,7 @@ public class LearnerControllerTest extends Specification {
         String json = gson.toJson(proposal);
 
         when: 'rest learn url is hit'
-        def response = mockMvc.perform(post(LEARNED_URL).contentType(MediaType.APPLICATION_JSON).content(json)).andReturn().response
+        def response = mockMvc.perform(post(LEARNED_POST_URL).contentType(MediaType.APPLICATION_JSON).content(json)).andReturn().response
 
         then: 'learner controller should return ok status'
         response.status == OK.value()
@@ -56,16 +57,16 @@ public class LearnerControllerTest extends Specification {
 
     def testShouldReturnLearnedProposal() {
         given:
-        Proposal proposal = Proposal.builder().id(3).key("key-3").value(15).build()
+        Proposal proposal = Proposal.builder().id(3).key("abc").value(15).build()
 
         String json = gson.toJson(proposal);
         when: 'rest learn url is hit'
-        mockMvc.perform(post(LEARNED_URL).contentType(MediaType.APPLICATION_JSON).content(json)).andReturn().response
+        mockMvc.perform(post(LEARNED_POST_URL).contentType(MediaType.APPLICATION_JSON).content(json)).andReturn().response
         def response = mockMvc.perform(get(LEARNED_URL)).andReturn().response
 
         then: 'learner controller should return learned value'
         response.status == OK.value()
-        response.contentAsString == '{"id":3,"key":"key-3","value":15,"server":null,"highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":3,"value":15,"server":null,"highestAcceptedProposalId":null,"key":"abc"}'
     }
 
     def testShouldReturnEmptyProposalWhenNoValueLearned2() {
@@ -74,7 +75,7 @@ public class LearnerControllerTest extends Specification {
 
         then: 'learner controller should return empty proposal'
         response.status == OK.value()
-        response.contentAsString == '{"id":null,"key":null,"value":null,"server":null,"highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":null,"value":null,"server":null,"highestAcceptedProposalId":null,"key":null}'
     }
 
 }
