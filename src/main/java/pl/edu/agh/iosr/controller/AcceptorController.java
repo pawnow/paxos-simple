@@ -61,12 +61,13 @@ public class AcceptorController {
             return previouslyAcceptedProposal.orElseGet(() -> null);
         }
         logger.info("Rejected proposal accept: " + newProposal);
-        return null;
+        return new Proposal();
     }
 
     private void informLearnersAndProposers(Proposal newProposal) {
 
         acceptorService.informLearnersAndProposers(newProposal);
+
     }
 
     private boolean shouldAccept(Proposal newProposal, Optional<Proposal> previouslyAcceptedProposal) {

@@ -8,6 +8,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import pl.edu.agh.iosr.cdm.Proposal
 import pl.edu.agh.iosr.cdm.ProposalRepository
+import pl.edu.agh.iosr.service.AcceptorService
 import pl.edu.agh.iosr.utils.ApplicationEndpoints
 import spock.lang.Specification
 import static org.mockito.Mockito.times;
@@ -31,6 +32,9 @@ public class AcceptorControllerTest extends Specification {
 
     @InjectMocks
     AcceptorController controllerUnderTest;
+
+    @Mock
+    AcceptorService acceptorService;
 
     private MockMvc mockMvc;
 
