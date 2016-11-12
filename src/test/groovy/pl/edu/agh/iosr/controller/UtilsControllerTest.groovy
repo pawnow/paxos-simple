@@ -27,6 +27,9 @@ public class UtilsControllerTest extends Specification {
     @Mock
     FaultService faultService
 
+    @Mock
+    LeaderService leaderService
+
     @InjectMocks
     UtilsController controllerUnderTest;
 
