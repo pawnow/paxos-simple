@@ -10,7 +10,6 @@ import pl.edu.agh.iosr.cdm.AcceptedProposalRepository;
 import pl.edu.agh.iosr.cdm.Proposal;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequestMapping("/learner")
 @RestController

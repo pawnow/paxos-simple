@@ -39,7 +39,7 @@ public class ProposerController {
 
     @RequestMapping("/propose")
     public Proposal propose(HttpServletRequest request, @RequestParam("key") String key, @RequestParam("value") Integer value) {
-        if(leaderService.isLeader(request.getRequestURL().toString())){
+        if (leaderService.isLeader(request.getRequestURL().toString())) {
             valueToSet = value;
             String url = request.getRequestURL().toString();
             HashMap<Node, Boolean> quorum = quorumProviderService.getMinimalQuorum();
@@ -49,28 +49,32 @@ public class ProposerController {
             Proposal proposal = Proposal.builder().id(id).key(key).server(url).build();
             proposerService.sendProposalToQuorum(quorum, proposal);
             return proposal;
-        }
-        else{
+        } else {
             return null;
         }
     }
 
     @RequestMapping("/accept")
-    public Proposal accept(@RequestBody Proposal proposal) {
-        HashMap<Node, Boolean> accepted = quorums.get(proposal.getId());
-        Proposal currentBest = bestProposal.get(proposal.getId());
-        if(proposal.getHighestAcceptedProposalId()!=null && (currentBest==null || (currentBest.getHighestAcceptedProposalId() < proposal.getHighestAcceptedProposalId()))){
+    public Proposal accept(HttpServletRequest request, @RequestBody Proposal proposal) {
+        if (leaderService.isLeader(request.getRequestURL().toString())) {
+            HashMap<Node, Boolean> accepted = quorums.get(proposal.getId());
+            Proposal currentBest = bestProposal.get(proposal.getId());
+            if (proposal.getHighestAcceptedProposalId() != null && (currentBest == null || (currentBest.getHighestAcceptedProposalId() < proposal.getHighestAcceptedProposalId()))) {
                 bestProposal.put(proposal.getId(), proposal);
-        }
-        accepted.keySet().stream().filter(node -> node.getNodeUrl().equals(proposal.getServer())).forEach(node -> accepted.put(node, true));
-        if(proposerService.checkForQuorum(accepted)) {
-            if(currentBest == null){
-                currentBest = Proposal.builder().id(proposal.getId()).key(proposal.getKey()).value(valueToSet).build();
             }
-            proposerService.sendAccept(accepted, currentBest);
-            return currentBest;
+            accepted.keySet().stream().filter(node -> node.getNodeUrl().equals(proposal.getServer())).forEach(node -> accepted.put(node, true));
+            if (proposerService.checkForQuorum(accepted)) {
+                if (currentBest == null) {
+                    currentBest = Proposal.builder().id(proposal.getId()).key(proposal.getKey()).value(valueToSet).build();
+                }
+                proposerService.sendAccept(accepted, currentBest);
+                return currentBest;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
+
     }
 }
