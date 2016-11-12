@@ -18,7 +18,12 @@ public class LeaderService {
     @Autowired
     private NodesRegistryRepository nodesRegistryRepository;
 
+    @Autowired
+    private FaultService faultService;
+
     public boolean isLeader(String url){
+        if (faultService.isDown())
+            return false;
         List<Node> nodes = Lists.newArrayList(nodesRegistryRepository.findAll());
         Optional<Long> serverId = getServerId(nodes, url);
         if(!serverId.isPresent()){
