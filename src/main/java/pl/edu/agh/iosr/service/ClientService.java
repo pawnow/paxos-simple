@@ -36,14 +36,11 @@ public class ClientService {
         boolean leaderExists = false;
         List<Node> nodes = Lists.newArrayList(nodesRegistryRepository.findAll());
         for (Node node : nodes) {
-            if(leaderService.isLeader(node.getNodeUrl())){
-                logger.info("Found leader, sending request");
-                leaderExists = true;
-                MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
-                params.set("key", key);
-                params.set("value", Integer.toString(value));
-                restTemplate.postForEntity("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_PROPOSE_URL, params, String.class);
-            }
+            leaderExists = true;
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+            params.set("key", key);
+            params.set("value", Integer.toString(value));
+            restTemplate.postForEntity("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_PROPOSE_URL, params, String.class);
         }
         return leaderExists;
     }
