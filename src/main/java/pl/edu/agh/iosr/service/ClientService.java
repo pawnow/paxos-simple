@@ -42,7 +42,7 @@ public class ClientService {
                 MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
                 params.set("key", key);
                 params.set("value", Integer.toString(value));
-                restTemplate.postForEntity("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL, params, String.class);
+                restTemplate.postForEntity("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_PROPOSE_URL, params, String.class);
             }
         }
         return leaderExists;
@@ -53,7 +53,7 @@ public class ClientService {
         RestTemplate restTemplate = new RestTemplate();
         HashMap<Integer, Integer> values = new HashMap<>();
         for (Node node : nodes){
-            AcceptedProposal proposal = restTemplate.getForObject("http://" + node.getNodeUrl() + ApplicationEndpoints.LERNER_URL.getEndpoint() + "?key=" + key, AcceptedProposal.class);
+            AcceptedProposal proposal = restTemplate.getForObject("http://" + node.getNodeUrl() + ApplicationEndpoints.LERNER_URL.getEndpoint() + "/" + key, AcceptedProposal.class);
             if(values.get(proposal.getValue()) == null){
                 values.put(proposal.getValue(), 1);
             } else {
@@ -64,11 +64,13 @@ public class ClientService {
         Integer bestValue = null;
         for(Integer localKey : values.keySet()){
             if(values.get(localKey) > max){
+                max = values.get(localKey);
                 bestValue = localKey;
             }
         }
-        return bestValue;
-
+        if(max > (nodes.size() / 2))
+            return bestValue;
+        return null;
     }
 
 }
