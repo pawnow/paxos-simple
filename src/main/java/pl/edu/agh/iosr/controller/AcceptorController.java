@@ -1,6 +1,7 @@
 package pl.edu.agh.iosr.controller;
 
 import com.google.common.collect.Lists;
+import com.sun.istack.internal.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class AcceptorController {
             acceptNewProposal(newProposal);
             logger.info("Accepted proposal propose: " + newProposal);
             Proposal oldProposal = previouslyAcceptedProposal.orElseGet(() -> null);
+            if (oldProposal == null){
+                oldProposal = new Proposal();
+            }
             informProposers(oldProposal);
             return oldProposal;
         }

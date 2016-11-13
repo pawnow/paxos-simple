@@ -52,7 +52,7 @@ public class ProposerController {
     }
 
     @RequestMapping("/accept")
-    public Proposal accept(HttpServletRequest request, @RequestBody Proposal proposal) {
+    public Proposal accept(HttpServletRequest request, @RequestBody(required = false) Proposal proposal) {
         if (leaderService.isLeader(request.getRequestURL().toString())) {
             HashMap<Node, Boolean> accepted = quorums.get(proposal.getId());
             Proposal currentBest = bestProposal.get(proposal.getId());
@@ -75,7 +75,7 @@ public class ProposerController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/clean")
-    public void clean(){
+    public void clean() {
         quorums = new HashMap<>();
         bestProposal = new HashMap<>();
         valueToSet = 0;
