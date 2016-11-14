@@ -43,9 +43,6 @@ public class AcceptorService {
     }
 
     public void informProposers(Proposal proposal){
-        if (proposal == null){
-            proposal = new Proposal();
-        }
         RestTemplate restTemplate = new RestTemplate();
         List<Node> nodes = Lists.newArrayList(nodesRegistryRepository.findAll());
         for (Node node : nodes){

@@ -11,6 +11,7 @@ import pl.edu.agh.iosr.cdm.Proposal;
 import pl.edu.agh.iosr.cdm.ProposalRepository;
 import pl.edu.agh.iosr.service.AcceptorService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,21 +35,31 @@ public class AcceptorController {
 
     @Transactional
     @RequestMapping(method = RequestMethod.GET, value = "/propose/{key}")
-    public List<Proposal> getAcceptedProposalForKey(@PathVariable(value="key") String key) {
+    public List<Proposal> getAcceptedProposalForKey(@PathVariable(value = "key") String key) {
         return proposalRepository.getProposalsForKey(key);
     }
 
     @Transactional
     @RequestMapping(method = RequestMethod.POST, value = "/propose")
-    public Proposal propose(@RequestBody Proposal newProposal) {
+    public Proposal propose(HttpServletRequest request, @RequestBody Proposal newProposal) {
+
         Optional<Proposal> previouslyAcceptedProposal = Optional.ofNullable(proposalRepository.getByMaxIdForKey(newProposal.getKey()));
+        String url = request.getRequestURL().toString();
         if (shouldAccept(newProposal, previouslyAcceptedProposal)) {
             acceptNewProposal(newProposal);
             logger.info("Accepted proposal propose: " + newProposal);
             Proposal oldProposal = previouslyAcceptedProposal.orElseGet(() -> null);
-            if (oldProposal == null){
-                oldProposal = new Proposal();
+
+            if (oldProposal == null) {
+                oldProposal = Proposal.builder().id(newProposal.getId())
+                        .key(newProposal.getKey())
+                        .server(url)
+                        .highestAcceptedProposalId(null).build();
+            } else {
+                oldProposal.setId(newProposal.getId());
+                oldProposal.setServer(url);
             }
+
             informProposers(oldProposal);
             return oldProposal;
         }
