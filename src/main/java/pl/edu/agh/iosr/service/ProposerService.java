@@ -62,8 +62,14 @@ public class ProposerService {
     public void sendAccept(ConcurrentHashMap<Node, Boolean> quorum, Proposal proposal){
         RestTemplate restTemplate = new RestTemplate();
         quorum.keySet().stream().filter(quorum::get).forEach(node -> {
-            restTemplate.postForObject("http://" + node.getNodeUrl() + ApplicationEndpoints.ACCEPTOR_ACCEPT_URL.getEndpoint(), proposal, String.class);
-            logger.debug("Sending confirmation to accepter " + "http://" + node.getNodeUrl() + ApplicationEndpoints.ACCEPTOR_ACCEPT_URL.getEndpoint());
+            try{
+                restTemplate.postForObject("http://" + node.getNodeUrl() + ApplicationEndpoints.ACCEPTOR_ACCEPT_URL.getEndpoint(), proposal, String.class);
+                logger.debug("Sending confirmation to accepter " + "http://" + node.getNodeUrl() + ApplicationEndpoints.ACCEPTOR_ACCEPT_URL.getEndpoint());
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                logger.error("Error during sending accepted proposal to quorum");
+            }
         });
     }
 
