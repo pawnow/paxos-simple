@@ -46,9 +46,15 @@ public class AcceptorController {
         Optional<Proposal> previouslyAcceptedProposal = Optional.ofNullable(proposalRepository.getByMaxIdForKey(newProposal.getKey()));
         String url = request.getRequestURL().toString();
         if (shouldAccept(newProposal, previouslyAcceptedProposal)) {
+
+            Proposal oldProposal = previouslyAcceptedProposal.orElseGet(() -> null);
+
+            if (oldProposal != null){
+                newProposal.setHighestAcceptedProposalId(oldProposal.getId());
+            }
+            newProposal.setServer(url);
             acceptNewProposal(newProposal);
             logger.info("Accepted proposal propose: " + newProposal);
-            Proposal oldProposal = previouslyAcceptedProposal.orElseGet(() -> null);
 
             if (oldProposal == null) {
                 oldProposal = Proposal.builder().id(newProposal.getId())
@@ -56,12 +62,12 @@ public class AcceptorController {
                         .server(url)
                         .highestAcceptedProposalId(null).build();
             } else {
-                oldProposal.setId(newProposal.getId());
+                oldProposal.setHighestAcceptedProposalId(oldProposal.getId());
                 oldProposal.setServer(url);
             }
 
             informProposers(oldProposal);
-            return oldProposal;
+            return null;
         }
         logger.info("Rejected proposal propose: " + newProposal);
         return null;
