@@ -1,7 +1,6 @@
 package pl.edu.agh.iosr.controller;
 
 import com.google.common.collect.Lists;
-import com.sun.istack.internal.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
