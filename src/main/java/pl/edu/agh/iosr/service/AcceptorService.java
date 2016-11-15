@@ -34,8 +34,8 @@ public class AcceptorService {
             try {
                 logger.debug("Sending learned proposal to learner " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.LERNER_URL);
                 restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.LERNER_URL, proposal, String.class);
-                logger.debug("Sending learned proposal to proposer " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL);
-                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL, proposal, String.class);
+                logger.debug("Sending learned proposal to proposer " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPTED_URL);
+                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPTED_URL, proposal, String.class);
             } catch (Exception e){
               e.printStackTrace();
             }

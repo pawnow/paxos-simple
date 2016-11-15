@@ -74,6 +74,12 @@ public class ProposerController {
         }
     }
 
+    @RequestMapping("/accepted")
+    public Proposal  accept(@RequestBody Proposal proposal) {
+        logger.info("Proposal has been accepted: " + proposal);
+        return proposal;
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/clean")
     public void clean() {
         quorums = new HashMap<>();
