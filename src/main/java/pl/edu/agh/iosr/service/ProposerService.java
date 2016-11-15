@@ -14,6 +14,7 @@ import pl.edu.agh.iosr.utils.ApplicationEndpoints;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Szymon on 2016-11-06.
@@ -28,7 +29,7 @@ public class ProposerService {
     @Autowired
     private LeaderService leaderService;
 
-    public void sendProposalToQuorum(HashMap<Node, Boolean> quorum, Proposal proposal){
+    public void sendProposalToQuorum(ConcurrentHashMap<Node, Boolean> quorum, Proposal proposal){
 
         RestTemplate restTemplate = new RestTemplate();
         for(Node node: quorum.keySet()){
@@ -42,7 +43,7 @@ public class ProposerService {
         }
     }
 
-    public Boolean checkForQuorum(HashMap<Node, Boolean> quorum) {
+    public Boolean checkForQuorum(ConcurrentHashMap<Node, Boolean> quorum) {
         int totalSize = Lists.newArrayList(nodesRegistryRepository.findAll()).size();
         int acceptedSize = 0;
         Boolean flag = false;
@@ -58,7 +59,7 @@ public class ProposerService {
         return flag;
     }
 
-    public void sendAccept(HashMap<Node, Boolean> quorum, Proposal proposal){
+    public void sendAccept(ConcurrentHashMap<Node, Boolean> quorum, Proposal proposal){
         RestTemplate restTemplate = new RestTemplate();
         quorum.keySet().stream().filter(quorum::get).forEach(node -> {
             restTemplate.postForObject("http://" + node.getNodeUrl() + ApplicationEndpoints.ACCEPTOR_ACCEPT_URL.getEndpoint(), proposal, String.class);

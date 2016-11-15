@@ -40,9 +40,7 @@ public class StateCleanerController {
     public void clean(HttpServletRequest request){
         logger.info("Cleaning repositories content");
         acceptedProposalRepository.deleteAll();
-        nodesRegistryRepository.deleteAll();
         stateCleanerService.clearControllers(request.getRequestURL().toString());
-
     }
 
 
