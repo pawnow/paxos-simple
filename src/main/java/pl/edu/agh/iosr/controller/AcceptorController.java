@@ -71,8 +71,8 @@ public class AcceptorController {
     @RequestMapping(method = RequestMethod.POST, value = "/accept")
     public Proposal accept(@RequestBody Proposal newProposal) {
         Optional<Proposal> previouslyAcceptedProposal = Optional.ofNullable(proposalRepository.getByMaxIdForKey(newProposal.getKey()));
-        if (shouldAccept(newProposal, previouslyAcceptedProposal)) {
-            acceptNewProposal(newProposal);
+        if (shouldAcceptOrEqual(newProposal, previouslyAcceptedProposal)) {
+            updateProposalValue(newProposal);
             informLearnersAndProposers(newProposal);
             logger.info("Accepted proposal accept: " + newProposal);
             return previouslyAcceptedProposal.orElseGet(() -> null);
@@ -93,8 +93,17 @@ public class AcceptorController {
         return newProposal.getId() > previouslyAcceptedProposal.map(Proposal::getId).orElseGet(() -> (-1L));
     }
 
+    private boolean shouldAcceptOrEqual(Proposal newProposal, Optional<Proposal> previouslyAcceptedProposal) {
+        return newProposal.getId() >= previouslyAcceptedProposal.map(Proposal::getId).orElseGet(() -> (-1L));
+    }
+
     private void acceptNewProposal(Proposal newProposal) {
         proposalRepository.save(newProposal);
     }
+
+    private void updateProposalValue(Proposal newProposal) {
+        proposalRepository.updateValueForProposalWithKeyAndId(newProposal.getKey(), newProposal.getId(), newProposal.getValue());
+    }
+
 
 }
