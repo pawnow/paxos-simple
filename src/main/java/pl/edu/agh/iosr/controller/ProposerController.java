@@ -40,7 +40,7 @@ public class ProposerController {
             valueToSet = value;
             String url = request.getRequestURL().toString().split("//")[1].split("/")[0];
             HashMap<Node, Boolean> quorum = quorumProviderService.getMinimalQuorum();
-            long id = proposerService.generateProposalId(url);
+            long id = proposerService.generateProposalId(request.getRequestURL().toString());
             quorums.put(id, quorum);
             logger.debug("created proposal with id: " + id + " and key " + key);
             Proposal proposal = Proposal.builder().id(id).key(key).server(url).build();
