@@ -15,6 +15,8 @@ import pl.edu.agh.iosr.service.QuorumProviderService
 import pl.edu.agh.iosr.utils.ApplicationEndpoints
 import spock.lang.Specification
 
+import java.util.concurrent.ConcurrentHashMap
+
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.verify
@@ -71,7 +73,7 @@ public class ProposerControllerTest extends Specification {
         Node secondNode = Node.builder().id(2).nodeUrl("1002").build();
         Node thirdNode = Node.builder().id(3).nodeUrl("1003").build();
         def nodes = Arrays.asList(firstNode, secondNode, thirdNode)
-        def quorum = new HashMap<Node, Boolean>()
+        def quorum = new ConcurrentHashMap<Node, Boolean>()
         quorum.put(firstNode, false)
         quorum.put(thirdNode, false)
 
@@ -96,7 +98,7 @@ public class ProposerControllerTest extends Specification {
         Node secondNode = Node.builder().id(2).nodeUrl("1002").build();
         Node thirdNode = Node.builder().id(3).nodeUrl("1003").build();
         def nodes = Arrays.asList(firstNode, secondNode, thirdNode)
-        def quorum = new HashMap<Node, Boolean>()
+        def quorum = new ConcurrentHashMap<Node, Boolean>()
         quorum.put(firstNode, false)
         quorum.put(thirdNode, false)
 
@@ -133,7 +135,7 @@ public class ProposerControllerTest extends Specification {
         Node secondNode = Node.builder().id(2).nodeUrl("1002").build();
         Node thirdNode = Node.builder().id(3).nodeUrl("1003").build();
         def nodes = Arrays.asList(firstNode, secondNode, thirdNode)
-        def quorum = new HashMap<Node, Boolean>()
+        def quorum = new ConcurrentHashMap<Node, Boolean>()
         quorum.put(firstNode, false)
         quorum.put(thirdNode, false)
 

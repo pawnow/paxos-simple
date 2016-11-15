@@ -12,6 +12,7 @@ import pl.edu.agh.iosr.service.QuorumProviderService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequestMapping("/proposer")
 @RestController
@@ -28,20 +29,20 @@ public class ProposerController {
     @Autowired
     private LeaderService leaderService;
 
-    private HashMap<Long, HashMap<Node, Boolean>> quorums = new HashMap<>();
+    private ConcurrentHashMap<Long, ConcurrentHashMap<Node, Boolean>> quorums = new ConcurrentHashMap<>();
 
-    private HashMap<Long, Proposal> bestProposal = new HashMap<>();
+    private ConcurrentHashMap<Long, Proposal> bestProposal = new ConcurrentHashMap<>();
 
-    private Integer valueToSet;
+    private ConcurrentHashMap<Long, Integer> valueToSet = new ConcurrentHashMap<>();
 
     @RequestMapping("/propose")
     public Proposal propose(HttpServletRequest request, @RequestParam("key") String key, @RequestParam("value") Integer value) {
         if (leaderService.isLeader(request.getRequestURL().toString())) {
-            valueToSet = value;
             String url = request.getRequestURL().toString().split("//")[1].split("/")[0];
-            HashMap<Node, Boolean> quorum = quorumProviderService.getMinimalQuorum();
+            ConcurrentHashMap<Node, Boolean> quorum = quorumProviderService.getMinimalQuorum();
             long id = proposerService.generateProposalId(request.getRequestURL().toString());
             quorums.put(id, quorum);
+            valueToSet.put(id, value);
             logger.debug("created proposal with id: " + id + " and key " + key);
             Proposal proposal = Proposal.builder().id(id).key(key).server(url).build();
             proposerService.sendProposalToQuorum(quorum, proposal);
@@ -54,7 +55,7 @@ public class ProposerController {
     @RequestMapping("/accept")
     public Proposal accept(HttpServletRequest request, @RequestBody Proposal proposal) {
         if (leaderService.isLeader(request.getRequestURL().toString())) {
-            HashMap<Node, Boolean> accepted = quorums.get(proposal.getId());
+            ConcurrentHashMap<Node, Boolean> accepted = quorums.get(proposal.getId());
             Proposal currentBest = bestProposal.get(proposal.getId());
             if (proposal.getHighestAcceptedProposalId() != null && (currentBest == null || (currentBest.getHighestAcceptedProposalId() < proposal.getHighestAcceptedProposalId()))) {
                 bestProposal.put(proposal.getId(), proposal);
@@ -62,7 +63,7 @@ public class ProposerController {
             accepted.keySet().stream().filter(node -> node.getNodeUrl().equals(proposal.getServer())).forEach(node -> accepted.put(node, true));
             if (proposerService.checkForQuorum(accepted)) {
                 if (currentBest == null) {
-                    currentBest = Proposal.builder().id(proposal.getId()).key(proposal.getKey()).value(valueToSet).build();
+                    currentBest = Proposal.builder().id(proposal.getId()).key(proposal.getKey()).value(valueToSet.get(proposal.getId())).build();
                 }
                 proposerService.sendAccept(accepted, currentBest);
                 return currentBest;
@@ -82,9 +83,9 @@ public class ProposerController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/clean")
     public void clean() {
-        quorums = new HashMap<>();
-        bestProposal = new HashMap<>();
-        valueToSet = 0;
+        quorums.clear();
+        bestProposal.clear();
+        valueToSet.clear();
         logger.info("ProposerController state has been reset");
     }
 }

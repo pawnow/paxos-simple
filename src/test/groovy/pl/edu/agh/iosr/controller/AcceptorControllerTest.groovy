@@ -147,8 +147,8 @@ public class AcceptorControllerTest extends Specification {
 
     def testProposeShouldAcceptNewProposalWhenPreviouslyAcceptedProposalWithLowerId() {
         given:
-        Proposal proposal = Proposal.builder().id(1).key("abc").server('http://localhost/acceptor/propose').value(20).build()
-        Proposal secondProposal = Proposal.builder().id(2).key("abc").server('http://localhost/acceptor/propose').value(18).build()
+        Proposal proposal = Proposal.builder().id(1).key("abc").server('localhost').value(20).build()
+        Proposal secondProposal = Proposal.builder().id(2).key("abc").server('localhost').value(18).build()
         String proposalJson = gson.toJson(proposal)
         String secondProposalJson = gson.toJson(secondProposal)
 
@@ -161,22 +161,20 @@ public class AcceptorControllerTest extends Specification {
         def secondResponse = mockMvc.perform(post(ACCEPTOR_PROPOSE_URL).contentType(MediaType.APPLICATION_JSON).content(secondProposalJson)).andReturn().response
         def secondGetAcceptedValueResponse = mockMvc.perform(get(ACCEPTOR_PROPOSE_GET_URL)).andReturn().response
 
-        //proposal.setHighestAcceptedProposalId(null)
-      /*  verify(proposalRepository, times(1)).save(proposal);
+        verify(proposalRepository, times(1)).save(proposal);
         verify(proposalRepository, times(1)).save(secondProposal);
         verify(proposalRepository, times(2)).getByMaxIdForKey('abc');
         verify(proposalRepository, times(2)).getProposalsForKey('abc');
-*/
+
         then: 'acceptor controller should return ok status and appropriate value'
-/*        response.status == OK.value()
+        response.status == OK.value()
         response.contentAsString == ''
         getAcceptedValueResponse.status == OK.value()
-        getAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":20,"server":"http://localhost/acceptor/propose","highestAcceptedProposalId":null}]'
+        getAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":20,"server":"localhost","highestAcceptedProposalId":null}]'
         secondResponse.status == OK.value()
-        secondResponse.contentAsString == '{"id":1,"key":"abc","value":20,"server":"http://localhost/acceptor/propose","highestAcceptedProposalId":null}'
+        secondResponse.contentAsString == '{"id":1,"key":"abc","value":20,"server":"localhost","highestAcceptedProposalId":null}'
         secondGetAcceptedValueResponse.status == OK.value()
-        secondGetAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":20,"server":"http://localhost/acceptor/propose","highestAcceptedProposalId":null},{"id":2,"key":"abc","value":18,"server":null,"highestAcceptedProposalId":null}]'
-   */
+        secondGetAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":20,"server":"localhost","highestAcceptedProposalId":null},{"id":2,"key":"abc","value":18,"server":"localhost","highestAcceptedProposalId":null}]'
     }
 
     def testAcceptShouldAcceptNewProposalAndReturnEmptyProposal() {
