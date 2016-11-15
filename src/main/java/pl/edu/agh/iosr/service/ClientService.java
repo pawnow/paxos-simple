@@ -40,7 +40,12 @@ public class ClientService {
             MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
             params.set("key", key);
             params.set("value", Integer.toString(value));
-            restTemplate.postForEntity("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_PROPOSE_URL, params, String.class);
+            try{
+                restTemplate.postForEntity("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_PROPOSE_URL, params, String.class);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
         }
         return leaderExists;
     }
@@ -50,11 +55,16 @@ public class ClientService {
         RestTemplate restTemplate = new RestTemplate();
         HashMap<Integer, Integer> values = new HashMap<>();
         for (Node node : nodes){
-            AcceptedProposal proposal = restTemplate.getForObject("http://" + node.getNodeUrl() + ApplicationEndpoints.LERNER_URL.getEndpoint() + "/" + key, AcceptedProposal.class);
-            if(values.get(proposal.getValue()) == null){
-                values.put(proposal.getValue(), 1);
-            } else {
-                values.put(proposal.getValue(), values.get(proposal.getValue())+1);
+            try{
+                AcceptedProposal proposal = restTemplate.getForObject("http://" + node.getNodeUrl() + ApplicationEndpoints.LERNER_URL.getEndpoint() + "/" + key, AcceptedProposal.class);
+                if(values.get(proposal.getValue()) == null){
+                    values.put(proposal.getValue(), 1);
+                } else {
+                    values.put(proposal.getValue(), values.get(proposal.getValue())+1);
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
             }
         }
         int max = 0;
