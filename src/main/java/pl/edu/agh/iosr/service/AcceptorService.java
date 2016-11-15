@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.edu.agh.iosr.cdm.Node;
@@ -46,7 +48,7 @@ public class AcceptorService {
         for (Node node : nodes){
             try {
                 logger.debug("Sending accept to proposer " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL);
-                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL, proposal, String.class);
+                restTemplate.postForEntity("http://" +node.getNodeUrl()+ ApplicationEndpoints.PROPOSER_ACCEPT_URL, proposal, Proposal.class);
             } catch (Exception e){
                 e.printStackTrace();
             }

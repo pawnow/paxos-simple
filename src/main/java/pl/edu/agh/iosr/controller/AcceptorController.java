@@ -1,6 +1,7 @@
 package pl.edu.agh.iosr.controller;
 
 import com.google.common.collect.Lists;
+import com.sun.istack.internal.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import pl.edu.agh.iosr.cdm.Proposal;
 import pl.edu.agh.iosr.cdm.ProposalRepository;
 import pl.edu.agh.iosr.service.AcceptorService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,20 +35,40 @@ public class AcceptorController {
 
     @Transactional
     @RequestMapping(method = RequestMethod.GET, value = "/propose/{key}")
-    public List<Proposal> getAcceptedProposalForKey(@PathVariable(value="key") String key) {
+    public List<Proposal> getAcceptedProposalForKey(@PathVariable(value = "key") String key) {
         return proposalRepository.getProposalsForKey(key);
     }
 
     @Transactional
     @RequestMapping(method = RequestMethod.POST, value = "/propose")
-    public Proposal propose(@RequestBody Proposal newProposal) {
+    public Proposal propose(HttpServletRequest request, @RequestBody Proposal newProposal) {
+
         Optional<Proposal> previouslyAcceptedProposal = Optional.ofNullable(proposalRepository.getByMaxIdForKey(newProposal.getKey()));
+        String url = request.getRequestURL().toString().split("//")[1].split("/")[0];
+
         if (shouldAccept(newProposal, previouslyAcceptedProposal)) {
+
+            Proposal oldProposal = previouslyAcceptedProposal.orElseGet(() -> null);
+
+            if (oldProposal != null){
+                newProposal.setHighestAcceptedProposalId(oldProposal.getId());
+            }
+            newProposal.setServer(url);
             acceptNewProposal(newProposal);
             logger.info("Accepted proposal propose: " + newProposal);
-            Proposal oldProposal = previouslyAcceptedProposal.orElseGet(() -> null);
+
+            if (oldProposal == null) {
+                oldProposal = Proposal.builder().id(newProposal.getId())
+                        .key(newProposal.getKey())
+                        .server(url)
+                        .highestAcceptedProposalId(null).build();
+            } else {
+                oldProposal.setHighestAcceptedProposalId(oldProposal.getId());
+                oldProposal.setServer(url);
+            }
+
             informProposers(oldProposal);
-            return oldProposal;
+            return null;
         }
         logger.info("Rejected proposal propose: " + newProposal);
         return null;

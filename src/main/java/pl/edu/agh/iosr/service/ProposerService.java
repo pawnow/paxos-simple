@@ -34,7 +34,7 @@ public class ProposerService {
         for(Node node: quorum.keySet()){
             try {
                 logger.debug("Sending proposal to accepter " + "http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_PROPOSE_URL.getEndpoint());
-                restTemplate.postForObject("http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_PROPOSE_URL.getEndpoint(), proposal, String.class);
+                restTemplate.postForEntity("http://" +node.getNodeUrl()+ ApplicationEndpoints.ACCEPTOR_PROPOSE_URL.getEndpoint(), proposal, Proposal.class);
             } catch (Exception e){
                 e.printStackTrace();
                 logger.error("Error during sending proposal to quorum");
