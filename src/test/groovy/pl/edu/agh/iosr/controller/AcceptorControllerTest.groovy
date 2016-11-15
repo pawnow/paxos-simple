@@ -60,7 +60,7 @@ public class AcceptorControllerTest extends Specification {
 
     def testProposeShouldAcceptNewProposalAndReturnEmptyProposal() {
         given:
-        Proposal proposal = Proposal.builder().id(1).key('abc').server('http://localhost/acceptor/propose').value(10).build()
+        Proposal proposal = Proposal.builder().id(1).key('abc').server('localhost').value(10).build()
         Gson gson = new Gson()
         String json = gson.toJson(proposal)
         when(proposalRepository.getByMaxId()).thenReturn(Optional.empty())
@@ -78,13 +78,13 @@ public class AcceptorControllerTest extends Specification {
         response.status == OK.value()
         response.contentAsString == ''
         getAcceptedValueResponse.status == OK.value()
-        getAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":10,"server":"http://localhost/acceptor/propose","highestAcceptedProposalId":null}]'
+        getAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":10,"server":"localhost","highestAcceptedProposalId":null}]'
 
     }
 
     def testProposeShouldNotAcceptNewProposalWhenPreviouslyAcceptedProposalWithHigherId() {
         given:
-        Proposal proposal = Proposal.builder().id(2).key("abc").server('http://localhost/acceptor/propose').value(5).build()
+        Proposal proposal = Proposal.builder().id(2).key("abc").server('localhost').value(5).build()
         Proposal secondProposal = Proposal.builder().id(1).key("abc").value(10).build()
         String proposalJson = gson.toJson(proposal)
         String secondProposalJson = gson.toJson(secondProposal)
@@ -106,18 +106,18 @@ public class AcceptorControllerTest extends Specification {
         response.status == OK.value()
         response.contentAsString == ''
         getAcceptedValueResponse.status == OK.value()
-        getAcceptedValueResponse.contentAsString == '[{"id":2,"key":"abc","value":5,"server":"http://localhost/acceptor/propose","highestAcceptedProposalId":null}]'
+        getAcceptedValueResponse.contentAsString == '[{"id":2,"key":"abc","value":5,"server":"localhost","highestAcceptedProposalId":null}]'
         secondResponse.status == OK.value()
         secondResponse.contentAsString == ''
         secondGetAcceptedValueResponse.status == OK.value()
-        secondGetAcceptedValueResponse.contentAsString == '[{"id":2,"key":"abc","value":5,"server":"http://localhost/acceptor/propose","highestAcceptedProposalId":null}]'
+        secondGetAcceptedValueResponse.contentAsString == '[{"id":2,"key":"abc","value":5,"server":"localhost","highestAcceptedProposalId":null}]'
 
     }
 
     def testProposeShouldNotAcceptNewProposalWhenPreviouslyAcceptedProposalWithSameId() {
         given:
-        Proposal proposal = Proposal.builder().id(1).key("abc").server('http://localhost/acceptor/propose').value(7).build()
-        Proposal secondProposal = Proposal.builder().id(1).key("abc").server('http://localhost/acceptor/propose').value(10).build()
+        Proposal proposal = Proposal.builder().id(1).key("abc").server('localhost').value(7).build()
+        Proposal secondProposal = Proposal.builder().id(1).key("abc").server('localhost').value(10).build()
         String proposalJson = gson.toJson(proposal)
         String secondProposalJson = gson.toJson(secondProposal)
 
@@ -138,11 +138,11 @@ public class AcceptorControllerTest extends Specification {
         response.status == OK.value()
         response.contentAsString == ''
         getAcceptedValueResponse.status == OK.value()
-        getAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":7,"server":"http://localhost/acceptor/propose","highestAcceptedProposalId":null}]'
+        getAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":7,"server":"localhost","highestAcceptedProposalId":null}]'
         secondResponse.status == OK.value()
         secondResponse.contentAsString == ''
         secondGetAcceptedValueResponse.status == OK.value()
-        secondGetAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":7,"server":"http://localhost/acceptor/propose","highestAcceptedProposalId":null}]'
+        secondGetAcceptedValueResponse.contentAsString == '[{"id":1,"key":"abc","value":7,"server":"localhost","highestAcceptedProposalId":null}]'
     }
 
     def testProposeShouldAcceptNewProposalWhenPreviouslyAcceptedProposalWithLowerId() {
