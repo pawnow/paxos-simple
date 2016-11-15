@@ -44,7 +44,8 @@ public class AcceptorController {
     public Proposal propose(HttpServletRequest request, @RequestBody Proposal newProposal) {
 
         Optional<Proposal> previouslyAcceptedProposal = Optional.ofNullable(proposalRepository.getByMaxIdForKey(newProposal.getKey()));
-        String url = request.getRequestURL().toString();
+        String url = request.getRequestURL().toString().split("//")[1].split("/")[0];
+
         if (shouldAccept(newProposal, previouslyAcceptedProposal)) {
 
             Proposal oldProposal = previouslyAcceptedProposal.orElseGet(() -> null);

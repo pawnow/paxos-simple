@@ -38,7 +38,7 @@ public class ProposerController {
     public Proposal propose(HttpServletRequest request, @RequestParam("key") String key, @RequestParam("value") Integer value) {
         if (leaderService.isLeader(request.getRequestURL().toString())) {
             valueToSet = value;
-            String url = request.getRequestURL().toString();
+            String url = request.getRequestURL().toString().split("//")[1].split("/")[0];
             HashMap<Node, Boolean> quorum = quorumProviderService.getMinimalQuorum();
             long id = proposerService.generateProposalId(url);
             quorums.put(id, quorum);
