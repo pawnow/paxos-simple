@@ -41,7 +41,7 @@ public class QuorumProviderService {
                 e.printStackTrace();
             }
         });
-        if(numberOfNodesToChoose < nodes.size()){
+        if(numberOfNodesToChoose > nodes.size()){
             throw new NotEnoughOnlineNodesException();
         }
         Collections.shuffle(nodes);
