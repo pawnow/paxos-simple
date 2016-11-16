@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.edu.agh.iosr.cdm.Node;
 import pl.edu.agh.iosr.cdm.NodesRegistryRepository;
+import pl.edu.agh.iosr.cdm.NotEnoughOnlineNodesException;
 import pl.edu.agh.iosr.utils.ApplicationEndpoints;
 
 import java.util.Collections;
@@ -24,7 +25,9 @@ public class QuorumProviderService {
     @Autowired
     private NodesRegistryRepository nodesRegistryRepository;
 
-    public ConcurrentHashMap<Node, Boolean> getMinimalQuorum(){
+    public ConcurrentHashMap<Node, Boolean> getMinimalQuorum() {
+        List<Node> allNodes = Lists.newArrayList(nodesRegistryRepository.findAll());
+        int numberOfNodesToChoose = (int) Math.floor(allNodes.size()/2)+1;
         List<Node> nodes = new LinkedList<>();
         RestTemplate restTemplate = new RestTemplate();
         Lists.newArrayList(nodesRegistryRepository.findAll()).forEach(node1 ->  {
@@ -37,11 +40,12 @@ public class QuorumProviderService {
             catch (Exception e){
                 e.printStackTrace();
             }
-
         });
-
+        if(numberOfNodesToChoose < nodes.size()){
+            throw new NotEnoughOnlineNodesException();
+        }
         Collections.shuffle(nodes);
-        List<Node> nodesHalf = nodes.subList(0, (int) Math.floor(nodes.size()/2)+1);
+        List<Node> nodesHalf = nodes.subList(0, numberOfNodesToChoose);
         ConcurrentHashMap<Node, Boolean> quorum = new ConcurrentHashMap<Node, Boolean>();
         for(Node node : nodesHalf){
             quorum.put(node, false);
