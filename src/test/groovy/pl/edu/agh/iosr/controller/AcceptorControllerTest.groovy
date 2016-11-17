@@ -162,7 +162,6 @@ public class AcceptorControllerTest extends Specification {
         def secondGetAcceptedValueResponse = mockMvc.perform(get(ACCEPTOR_PROPOSE_GET_URL)).andReturn().response
 
         verify(proposalRepository, times(1)).save(proposal);
-        verify(proposalRepository, times(1)).save(secondProposal);
         verify(proposalRepository, times(2)).getByMaxIdForKey('abc');
         verify(proposalRepository, times(2)).getProposalsForKey('abc');
 

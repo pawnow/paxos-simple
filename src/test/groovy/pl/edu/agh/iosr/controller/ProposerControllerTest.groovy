@@ -89,7 +89,7 @@ public class ProposerControllerTest extends Specification {
 
         then: 'proposer controller should return ok status and appropriate value'
         response.status == OK.value()
-        response.contentAsString == '{"id":7,"key":"abc","value":null,"server":"localhost","highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":7,"key":"abc","value":5,"server":"localhost","highestAcceptedProposalId":null}'
     }
 
     def testAcceptWithHighedIdFromQuorum() {
@@ -122,7 +122,7 @@ public class ProposerControllerTest extends Specification {
 
         then: 'proposer controller should return ok status and appropriate value'
         response.status == OK.value()
-        response.contentAsString == '{"id":5,"key":"abc","value":null,"server":"localhost","highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":5,"key":"abc","value":5,"server":"localhost","highestAcceptedProposalId":null}'
         responseAccept.status == OK.value()
         responseAccept.contentAsString == ''
         responseAccept2.status == OK.value()
@@ -159,7 +159,7 @@ public class ProposerControllerTest extends Specification {
 
         then: 'proposer controller should return ok status and appropriate value'
         response.status == OK.value()
-        response.contentAsString == '{"id":5,"key":"abc","value":null,"server":"localhost","highestAcceptedProposalId":null}'
+        response.contentAsString == '{"id":5,"key":"abc","value":5,"server":"localhost","highestAcceptedProposalId":null}'
         responseAccept.status == OK.value()
         responseAccept.contentAsString == ''
         responseAccept2.status == OK.value()

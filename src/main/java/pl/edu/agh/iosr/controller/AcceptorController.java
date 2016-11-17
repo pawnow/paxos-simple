@@ -53,11 +53,11 @@ public class AcceptorController {
         if (shouldAccept(newProposal, previouslyAcceptedProposal)) {
 
             Proposal oldProposal = previouslyAcceptedProposal.orElseGet(() -> null);
-            acceptNewProposal(newProposal);
             if (oldProposal != null){
                 acceptedProposal.setValue(oldProposal.getValue());
                 acceptedProposal.setHighestAcceptedProposalId(oldProposal.getId());
             }
+            acceptNewProposal(acceptedProposal);
             acceptedProposal.setServer(url);
             logger.info("Accepted proposal propose: " + newProposal);
             informProposers(acceptedProposal);

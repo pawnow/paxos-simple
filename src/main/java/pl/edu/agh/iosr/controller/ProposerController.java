@@ -44,7 +44,7 @@ public class ProposerController {
             quorums.put(id, quorum);
             valueToSet.put(id, value);
             logger.debug("created proposal with id: " + id + " and key " + key);
-            Proposal proposal = Proposal.builder().id(id).key(key).server(url).build();
+            Proposal proposal = Proposal.builder().id(id).key(key).value(value).server(url).build();
             proposerService.sendProposalToQuorum(quorum, proposal);
             return proposal;
         } else {
