@@ -60,6 +60,7 @@ public class ProposerController {
             if (proposal.getHighestAcceptedProposalId() != null && (currentBest == null || (currentBest.getHighestAcceptedProposalId() < proposal.getHighestAcceptedProposalId()))) {
                 bestProposal.put(proposal.getId(), proposal);
             }
+            currentBest = bestProposal.get(proposal.getId());
             accepted.keySet().stream().filter(node -> node.getNodeUrl().equals(proposal.getServer())).forEach(node -> accepted.put(node, true));
             if (proposerService.checkForQuorum(accepted)) {
                 if (currentBest == null) {

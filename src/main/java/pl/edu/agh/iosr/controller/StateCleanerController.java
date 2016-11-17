@@ -26,9 +26,6 @@ public class StateCleanerController {
     AcceptedProposalRepository acceptedProposalRepository;
 
     @Autowired
-    NodesRegistryRepository nodesRegistryRepository;
-
-    @Autowired
     ProposalRepository proposalRepository;
 
     @Autowired
@@ -40,6 +37,7 @@ public class StateCleanerController {
     public void clean(HttpServletRequest request){
         logger.info("Cleaning repositories content");
         acceptedProposalRepository.deleteAll();
+        proposalRepository.deleteAll();
         stateCleanerService.clearControllers(request.getRequestURL().toString());
     }
 
