@@ -30,7 +30,7 @@ public class Application {
             nodesRegistryRepository.deleteAll();
             nodesRegistryRepository.save(new Node(3l, "paxos3.eu-west-1.elasticbeanstalk.com"));
             nodesRegistryRepository.save(new Node(2l, "paxos2.eu-west-1.elasticbeanstalk.com"));
-            nodesRegistryRepository.save(new Node(1l, "paxos1.qwxpdbpqdg.eu-west-1.elasticbeanstalk.com"));
+            nodesRegistryRepository.save(new Node(1l, "paxos4.eu-west-1.elasticbeanstalk.com"));
         };
     }
 }
